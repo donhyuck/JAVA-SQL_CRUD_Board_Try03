@@ -95,6 +95,11 @@ public class App {
 
 			List<Article> articles = new ArrayList<>();
 
+			if (articles.size() == 0) {
+				System.out.println("게시글이 존재하지 않습니다.");
+				return 0;
+			}
+
 			System.out.println("== 게시글 목록 ==");
 
 			// DBUtil 적용
@@ -105,11 +110,6 @@ public class App {
 			List<Map<String, Object>> articleListMap = DBUtil.selectRows(conn, sql);
 			for (Map<String, Object> articleMap : articleListMap) {
 				articles.add(new Article(articleMap));
-			}
-
-			if (articles.size() == 0) {
-				System.out.println("게시글이 존재하지 않습니다.");
-				return 0;
 			}
 
 			System.out.println("번호 / 제목");
@@ -176,6 +176,38 @@ public class App {
 
 			DBUtil.delete(conn, sql);
 			System.out.printf("%d번 게시글이 삭제되었습니다.\n", id);
+
+		} else if (command.startsWith("article detail")) {
+
+			int id = Integer.parseInt(command.split(" ")[2].trim());
+
+			// 게시글이 없을 경우 예외처리
+			SecSql sql = new SecSql();
+			sql.append("SELECT COUNT(*)");
+			sql.append("FROM article");
+			sql.append("WHERE id = ?", id);
+
+			int foundArticleId = DBUtil.selectRowIntValue(conn, sql);
+
+			if (foundArticleId == 0) {
+				System.out.printf("%d번 게시글이 존재하지 않습니다.\n", id);
+				return 0;
+			}
+
+			// DBUtil 적용
+			sql = new SecSql();
+			sql.append("SELECT * FROM article");
+			sql.append("WHERE id = ?", id);
+
+			Map<String, Object> articleMap = DBUtil.selectRow(conn, sql);
+			Article article = new Article(articleMap);
+
+			System.out.printf("== %d번 게시글 조회 ==\n", id);
+			System.out.printf(" 번 호  : %d\n", article.id);
+			System.out.printf("등록날짜 : %s\n", article.regDate);
+			System.out.printf("수정날짜 : %s\n", article.updateDate);
+			System.out.printf(" 제 목  : %s\n", article.title);
+			System.out.printf(" 날 짜  : %s\n", article.body);
 
 		} else {
 			System.out.println("잘못된 명령어입니다.");
