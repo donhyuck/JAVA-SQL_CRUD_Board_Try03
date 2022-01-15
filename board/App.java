@@ -22,28 +22,48 @@ public class App {
 			Class.forName("com.mysql.cj.jdbc.Driver"); // Mysql JDBC 드라이버 로딩
 			String url = "jdbc:mysql://127.0.0.1:3306/text_board?useUnicode=true&characterEncoding=utf8&autoReconnect=true&serverTimezone=Asia/Seoul&useOldAliasMetadataBehavior=true&zeroDateTimeNehavior=convertToNull";
 			conn = DriverManager.getConnection(url, "root", "");
+
+			System.out.println("== 프로그램 시작 ==");
+
+			while (true) {
+
+				System.out.print("명령어 : ");
+				String command = input.nextLine();
+
+				command = command.trim();
+
+				if (command.length() == 0) {
+					continue;
+				}
+
+				int actionResult = doAction(conn, input, command, pstat);
+
+				// 프로그램 종료 제어
+				if (actionResult == -1) {
+					break;
+				}
+			}
+
 		} catch (ClassNotFoundException e) {
 			System.out.println("드라이버 로딩 실패");
 		} catch (SQLException e) {
 			System.out.println("에러: " + e);
-		}
-
-		System.out.println("== 프로그램 시작 ==");
-
-		while (true) {
-
-			System.out.print("명령어 : ");
-			String command = input.nextLine();
-
-			command = command.trim();
-
-			if (command.length() == 0) {
-				continue;
+		} finally {
+			try {
+				if (conn != null && !conn.isClosed()) {
+					conn.close(); // 연결 종료
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
 			}
 
-			// 함수로 묶어준다.
-			doAction(conn, input, command, pstat);
-
+			try {
+				if (pstat != null && !pstat.isClosed()) {
+					pstat.close(); // 연결 종료
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -162,22 +182,6 @@ public class App {
 
 		} else {
 			System.out.println("잘못된 명령어입니다.");
-		}
-
-		try {
-			if (conn != null && !conn.isClosed()) {
-				conn.close(); // 연결 종료
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-
-		try {
-			if (pstat != null && !pstat.isClosed()) {
-				pstat.close(); // 연결 종료
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
 		}
 
 		return 0;
