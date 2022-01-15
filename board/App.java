@@ -183,7 +183,6 @@ public class App {
 		} else {
 			System.out.println("잘못된 명령어입니다.");
 		}
-
 		return 0;
 	}
 
