@@ -14,7 +14,9 @@ public class App {
 	public void start() {
 
 		Scanner input = new Scanner(System.in);
+
 		Connection conn = null;
+		PreparedStatement pstat = null; // SQL 구문을 실행하는 역할
 
 		try {
 			Class.forName("com.mysql.cj.jdbc.Driver"); // Mysql JDBC 드라이버 로딩
@@ -56,7 +58,6 @@ public class App {
 				body = input.nextLine();
 
 				// JDBC적용
-				PreparedStatement pstat = null; // SQL 구문을 실행하는 역할
 
 				try {
 
@@ -73,22 +74,6 @@ public class App {
 
 				} catch (SQLException e) {
 					e.printStackTrace();
-				} finally { // 예외 상황이든 아니든 무조건 마지막에 실행하는 finally
-					try {
-						if (conn != null && !conn.isClosed()) {
-							conn.close(); // 연결 종료
-						}
-					} catch (SQLException e) {
-						e.printStackTrace();
-					}
-
-					try {
-						if (pstat != null && !pstat.isClosed()) {
-							pstat.close(); // 연결 종료
-						}
-					} catch (SQLException e) {
-						e.printStackTrace();
-					}
 				}
 
 			} else if (command.equals("article list")) {
@@ -98,7 +83,6 @@ public class App {
 				System.out.println("== 게시글 목록 ==");
 
 				// JDBC적용
-				PreparedStatement pstat = null; // SQL 구문을 실행하는 역할
 				ResultSet rs = null; // Resultset은 executeQuery의 결과값을 저장, next함수를 통해 데이터를 참조
 
 				try {
@@ -133,22 +117,6 @@ public class App {
 
 				} catch (SQLException e) {
 					e.printStackTrace();
-				} finally { // 예외 상황이든 아니든 무조건 마지막에 실행하는 finally
-					try {
-						if (conn != null && !conn.isClosed()) {
-							conn.close(); // 연결 종료
-						}
-					} catch (SQLException e) {
-						e.printStackTrace();
-					}
-
-					try {
-						if (pstat != null && !pstat.isClosed()) {
-							pstat.close(); // 연결 종료
-						}
-					} catch (SQLException e) {
-						e.printStackTrace();
-					}
 				}
 
 			} else if (command.startsWith("article modify")) {
@@ -165,7 +133,6 @@ public class App {
 				body = input.nextLine();
 
 				// JDBC적용
-				PreparedStatement pstat = null; // SQL 구문을 실행하는 역할
 
 				try {
 
@@ -181,31 +148,30 @@ public class App {
 
 				} catch (SQLException e) {
 					System.out.println("에러: " + e);
-				} finally { // 예외 상황이든 아니든 무조건 마지막에 실행하는 finally
-					try {
-						if (conn != null && !conn.isClosed()) {
-							conn.close(); // 연결 종료
-						}
-					} catch (SQLException e) {
-						e.printStackTrace();
-					}
-
-					try {
-						if (pstat != null && !pstat.isClosed()) {
-							pstat.close(); // 연결 종료
-						}
-					} catch (SQLException e) {
-						e.printStackTrace();
-					}
 				}
 
 				System.out.printf("%d번 글이 수정되었습니다.\n", id);
-				
+
 			} else {
 				System.out.println("잘못된 명령어입니다.");
 			}
 		}
 
+		try {
+			if (conn != null && !conn.isClosed()) {
+				conn.close(); // 연결 종료
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		try {
+			if (pstat != null && !pstat.isClosed()) {
+				pstat.close(); // 연결 종료
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 
 }
