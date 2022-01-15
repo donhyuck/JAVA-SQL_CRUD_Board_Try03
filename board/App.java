@@ -19,7 +19,6 @@ public class App {
 		Scanner input = new Scanner(System.in);
 
 		Connection conn = null;
-		PreparedStatement pstat = null; // SQL 구문을 실행하는 역할
 
 		try {
 			Class.forName("com.mysql.cj.jdbc.Driver"); // Mysql JDBC 드라이버 로딩
@@ -39,7 +38,7 @@ public class App {
 					continue;
 				}
 
-				int actionResult = doAction(conn, input, command, pstat);
+				int actionResult = doAction(conn, input, command);
 
 				// 프로그램 종료 제어
 				if (actionResult == -1) {
@@ -59,18 +58,10 @@ public class App {
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
-
-			try {
-				if (pstat != null && !pstat.isClosed()) {
-					pstat.close(); // 연결 종료
-				}
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
 		}
 	}
 
-	private int doAction(Connection conn, Scanner input, String command, PreparedStatement pstat) {
+	private int doAction(Connection conn, Scanner input, String command) {
 
 		if (command.equals("system exit")) {
 			System.out.println("== 프로그램 종료 ==");
@@ -130,17 +121,27 @@ public class App {
 
 			int id = Integer.parseInt(command.split(" ")[2].trim());
 
-			String title;
-			String body;
+			// 게시글이 없을 경우 예외처리
+			SecSql sql = new SecSql();
+			sql.append("SELECT COUNT(*)");
+			sql.append("FROM article");
+			sql.append("WHERE id = ?", id);
+
+			int foundArticleId = DBUtil.selectRowIntValue(conn, sql);
+
+			if (foundArticleId == 0) {
+				System.out.printf("%d번 게시글이 존재하지 않습니다.\n", id);
+				return 0;
+			}
 
 			System.out.println("== 게시글 수정 ==");
 			System.out.print("새 제목 : ");
-			title = input.nextLine();
+			String title = input.nextLine();
 			System.out.print("새 내용 : ");
-			body = input.nextLine();
+			String body = input.nextLine();
 
 			// DBUtil 적용
-			SecSql sql = new SecSql();
+			sql = new SecSql();
 			sql.append("UPDATE article");
 			sql.append("SET regDate = NOW()");
 			sql.append(", updateDate = NOW()");
@@ -150,6 +151,31 @@ public class App {
 
 			DBUtil.update(conn, sql);
 			System.out.printf("%d번 게시글이 수정되었습니다.\n", id);
+
+		} else if (command.startsWith("article delete")) {
+
+			int id = Integer.parseInt(command.split(" ")[2].trim());
+
+			// 게시글이 없을 경우 예외처리
+			SecSql sql = new SecSql();
+			sql.append("SELECT COUNT(*)");
+			sql.append("FROM article");
+			sql.append("WHERE id = ?", id);
+
+			int foundArticleId = DBUtil.selectRowIntValue(conn, sql);
+
+			if (foundArticleId == 0) {
+				System.out.printf("%d번 게시글이 존재하지 않습니다.\n", id);
+				return 0;
+			}
+
+			// DBUtil 적용
+			sql = new SecSql();
+			sql.append("DELETE FROM article");
+			sql.append("WHERE id = ?", id);
+
+			DBUtil.delete(conn, sql);
+			System.out.printf("%d번 게시글이 삭제되었습니다.\n", id);
 
 		} else {
 			System.out.println("잘못된 명령어입니다.");
