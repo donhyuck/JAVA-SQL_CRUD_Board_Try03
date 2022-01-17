@@ -95,29 +95,37 @@ public class App {
 
 			List<Article> articles = new ArrayList<>();
 
-			if (articles.size() == 0) {
-				System.out.println("게시글이 존재하지 않습니다.");
-				return 0;
-			}
-
-			System.out.println("== 게시글 목록 ==");
-
 			// DBUtil 적용
 			SecSql sql = new SecSql();
 			sql.append("SELECT * FROM article");
 			sql.append("ORDER BY id DESC");
 
 			List<Map<String, Object>> articleListMap = DBUtil.selectRows(conn, sql);
+
 			for (Map<String, Object> articleMap : articleListMap) {
 				articles.add(new Article(articleMap));
 			}
 
+			if (articles.size() == 0) {
+				System.out.println("게시글이 존재하지 않습니다.");
+				return 0;
+			}
+
+			System.out.println("== 게시글 목록 ==");
 			System.out.println("번호 / 제목");
 			for (Article article : articles) {
 				System.out.printf(" %d / %s \n", article.id, article.title);
 			}
 
-		} else if (command.startsWith("article modify")) {
+		} else if (command.startsWith("article modify ")) {
+
+			// 정수이외는 예외처리(정규표현식)
+			boolean isInt = command.split(" ")[2].matches("-?\\d+");
+
+			if (!isInt) {
+				System.out.println("게시글의 ID는 숫자로 입력해주세요.");
+				return 0;
+			}
 
 			int id = Integer.parseInt(command.split(" ")[2].trim());
 
@@ -152,7 +160,15 @@ public class App {
 			DBUtil.update(conn, sql);
 			System.out.printf("%d번 게시글이 수정되었습니다.\n", id);
 
-		} else if (command.startsWith("article delete")) {
+		} else if (command.startsWith("article delete ")) {
+
+			// 정수이외는 예외처리(정규표현식)
+			boolean isInt = command.split(" ")[2].matches("-?\\d+");
+
+			if (!isInt) {
+				System.out.println("게시글의 ID는 숫자로 입력해주세요.");
+				return 0;
+			}
 
 			int id = Integer.parseInt(command.split(" ")[2].trim());
 
@@ -177,7 +193,15 @@ public class App {
 			DBUtil.delete(conn, sql);
 			System.out.printf("%d번 게시글이 삭제되었습니다.\n", id);
 
-		} else if (command.startsWith("article detail")) {
+		} else if (command.startsWith("article detail ")) {
+
+			// 정수이외는 예외처리(정규표현식)
+			boolean isInt = command.split(" ")[2].matches("-?\\d+");
+
+			if (!isInt) {
+				System.out.println("게시글의 ID는 숫자로 입력해주세요.");
+				return 0;
+			}
 
 			int id = Integer.parseInt(command.split(" ")[2].trim());
 
