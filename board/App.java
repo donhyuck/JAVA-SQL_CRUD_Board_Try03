@@ -79,7 +79,6 @@ public class App {
 			System.out.print("내용 : ");
 			body = input.nextLine();
 
-			// DBUtil 적용
 			SecSql sql = new SecSql();
 			sql.append("INSERT INTO article");
 			sql.append("SET regDate = NOW()");
@@ -95,7 +94,6 @@ public class App {
 
 			List<Article> articles = new ArrayList<>();
 
-			// DBUtil 적용
 			SecSql sql = new SecSql();
 			sql.append("SELECT * FROM article");
 			sql.append("ORDER BY id DESC");
@@ -119,7 +117,6 @@ public class App {
 
 		} else if (command.startsWith("article modify ")) {
 
-			// 정수이외는 예외처리(정규표현식)
 			boolean isInt = command.split(" ")[2].matches("-?\\d+");
 
 			if (!isInt) {
@@ -129,7 +126,6 @@ public class App {
 
 			int id = Integer.parseInt(command.split(" ")[2].trim());
 
-			// 게시글이 없을 경우 예외처리
 			SecSql sql = new SecSql();
 			sql.append("SELECT COUNT(*)");
 			sql.append("FROM article");
@@ -148,7 +144,6 @@ public class App {
 			System.out.print("새 내용 : ");
 			String body = input.nextLine();
 
-			// DBUtil 적용
 			sql = new SecSql();
 			sql.append("UPDATE article");
 			sql.append("SET regDate = NOW()");
@@ -162,7 +157,6 @@ public class App {
 
 		} else if (command.startsWith("article delete ")) {
 
-			// 정수이외는 예외처리(정규표현식)
 			boolean isInt = command.split(" ")[2].matches("-?\\d+");
 
 			if (!isInt) {
@@ -172,7 +166,6 @@ public class App {
 
 			int id = Integer.parseInt(command.split(" ")[2].trim());
 
-			// 게시글이 없을 경우 예외처리
 			SecSql sql = new SecSql();
 			sql.append("SELECT COUNT(*)");
 			sql.append("FROM article");
@@ -185,7 +178,6 @@ public class App {
 				return 0;
 			}
 
-			// DBUtil 적용
 			sql = new SecSql();
 			sql.append("DELETE FROM article");
 			sql.append("WHERE id = ?", id);
@@ -195,7 +187,6 @@ public class App {
 
 		} else if (command.startsWith("article detail ")) {
 
-			// 정수이외는 예외처리(정규표현식)
 			boolean isInt = command.split(" ")[2].matches("-?\\d+");
 
 			if (!isInt) {
@@ -205,7 +196,6 @@ public class App {
 
 			int id = Integer.parseInt(command.split(" ")[2].trim());
 
-			// 게시글이 없을 경우 예외처리
 			SecSql sql = new SecSql();
 			sql.append("SELECT COUNT(*)");
 			sql.append("FROM article");
@@ -218,7 +208,6 @@ public class App {
 				return 0;
 			}
 
-			// DBUtil 적용
 			sql = new SecSql();
 			sql.append("SELECT * FROM article");
 			sql.append("WHERE id = ?", id);
@@ -232,6 +221,90 @@ public class App {
 			System.out.printf("수정날짜 : %s\n", article.updateDate);
 			System.out.printf(" 제 목  : %s\n", article.title);
 			System.out.printf(" 날 짜  : %s\n", article.body);
+
+		} else if (command.equals("member join")) {
+			System.out.println("== 회원가입 ==");
+
+			String loginId; // 1. 아이디 생성 2. 중복아이디
+			String loginPw; // 비밀번호 입력
+			String loginPwConfirm; // 비밀번호와 1. 일치 2. 불일치
+			String name;
+
+			SecSql sql = new SecSql();
+
+			// 아이디 입력
+			while (true) {
+
+				System.out.print("로그인 아이디 : ");
+				loginId = input.nextLine();
+
+				// 미입력(공백) 방지
+				if (loginId.length() == 0) {
+					System.out.println("아이디를 입력해주세요.");
+					continue;
+				}
+
+				// DB에 등록된 아이디를 조회, 아이디 중복방지
+				sql.append("SELECT COUNT(*) FROM `member`");
+				sql.append("WHERE loginId = ?", loginId);
+
+				// 일치하는 아이디가 없으면 0 리턴
+				int memberCnt = DBUtil.selectRowIntValue(conn, sql);
+
+				if (memberCnt > 0) {
+					System.out.println("이미 존재하는 아이디입니다.");
+					continue;
+				}
+
+				break;
+			}
+
+			// 비밀번호 입력
+			while (true) {
+
+				System.out.print("로그인 비밀번호 : ");
+				loginPw = input.nextLine();
+
+				// 미입력(공백) 방지
+				if (loginPw.length() == 0) {
+					System.out.println("비밀번호를 입력해주세요.");
+					continue;
+				}
+
+				// 비밀번호 확인
+				while (true) {
+					System.out.print("로그인 비밀번호 확인 : ");
+					loginPwConfirm = input.nextLine();
+
+					// 미입력(공백) 방지
+					if (loginPwConfirm.length() == 0) {
+						System.out.println("비밀번호를 확인해주세요.");
+						continue;
+					}
+
+					break;
+				}
+
+				if (!loginPw.equals(loginPwConfirm)) {
+					System.out.println("입력하신 비밀번호와 일치하지 않습니다.");
+					continue;
+				}
+
+				break;
+			}
+
+			while (true) {
+				System.out.print("이름 : ");
+				name = input.nextLine();
+
+				if (name.length() == 0) {
+					System.out.println("이름을 입력해주세요.");
+					continue;
+				}
+				
+				break;
+
+			}
 
 		} else {
 			System.out.println("잘못된 명령어입니다.");
