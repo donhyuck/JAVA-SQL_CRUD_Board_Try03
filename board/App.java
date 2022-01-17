@@ -230,10 +230,20 @@ public class App {
 			String loginPwConfirm; // 비밀번호와 1. 일치 2. 불일치
 			String name;
 
-			SecSql sql = new SecSql();
+			SecSql sql;
+
+			// 입력횟수 제한, 3회 틀릴시 다시 명령어 입력받기
+			int blockCnt = 0;
 
 			// 아이디 입력
 			while (true) {
+
+				sql = new SecSql();
+
+				if (blockCnt >= 3) {
+					System.out.println("입력횟수 초과! 다시 시도해주세요.");
+					return 0;
+				}
 
 				System.out.print("로그인 아이디 : ");
 				loginId = input.nextLine();
@@ -241,6 +251,7 @@ public class App {
 				// 미입력(공백) 방지
 				if (loginId.length() == 0) {
 					System.out.println("아이디를 입력해주세요.");
+					blockCnt++;
 					continue;
 				}
 
@@ -253,14 +264,21 @@ public class App {
 
 				if (memberCnt > 0) {
 					System.out.println("이미 존재하는 아이디입니다.");
+					blockCnt++;
 					continue;
 				}
 
 				break;
 			}
 
+			blockCnt = 0;
 			// 비밀번호 입력
 			while (true) {
+
+				if (blockCnt >= 3) {
+					System.out.println("입력횟수 초과! 다시 시도해주세요.");
+					return 0;
+				}
 
 				System.out.print("로그인 비밀번호 : ");
 				loginPw = input.nextLine();
@@ -268,6 +286,7 @@ public class App {
 				// 미입력(공백) 방지
 				if (loginPw.length() == 0) {
 					System.out.println("비밀번호를 입력해주세요.");
+					blockCnt++;
 					continue;
 				}
 
@@ -287,6 +306,7 @@ public class App {
 
 				if (!loginPw.equals(loginPwConfirm)) {
 					System.out.println("입력하신 비밀번호와 일치하지 않습니다.");
+					blockCnt++;
 					continue;
 				}
 
@@ -301,10 +321,23 @@ public class App {
 					System.out.println("이름을 입력해주세요.");
 					continue;
 				}
-				
+
 				break;
 
 			}
+
+			sql = new SecSql();
+
+			sql.append("INSERT INTO `member`");
+			sql.append("SET regDate = NOW()");
+			sql.append(", updateDate = NOW()");
+			sql.append(", loginId = ?", loginId);
+			sql.append(", loginPw = ?", loginPw);
+			sql.append(", name = ?", name);
+
+			DBUtil.insert(conn, sql);
+
+			System.out.printf("%s님 환영합니다.\n", name);
 
 		} else {
 			System.out.println("잘못된 명령어입니다.");
