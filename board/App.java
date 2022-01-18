@@ -345,15 +345,26 @@ public class App {
 
 			String loginId;
 			String loginPw;
-			SecSql sql = new SecSql();
+			SecSql sql;
+
+			// 로그인 입력횟수 제한
+			int blockCnt = 0;
 
 			while (true) {
+
+				sql = new SecSql();
+
+				if (blockCnt >= 3) {
+					System.out.println("입력횟수 초과! 다시 시도해주세요.");
+					return 0;
+				}
 
 				System.out.print("로그인 아이디 : ");
 				loginId = input.nextLine();
 
 				if (loginId.length() == 0) {
 					System.out.println("아이디를 입력해주세요.");
+					blockCnt++;
 					continue;
 				}
 
@@ -365,18 +376,28 @@ public class App {
 				// 해당하는 아이디가 없으면 0이 리턴되며, 이는 로그인할 아이디가 없는 것이다.
 				if (memberCnt == 0) {
 					System.out.println("아이디가 존재하지 않습니다.");
+					blockCnt++;
 					continue;
 				}
 				break;
 
 			}
 
+			blockCnt = 0;
+
 			while (true) {
+
+				if (blockCnt >= 3) {
+					System.out.println("입력횟수 초과! 다시 시도해주세요.");
+					return 0;
+				}
+
 				System.out.print("로그인 비밀번호 : ");
 				loginPw = input.nextLine();
 
 				if (loginPw.length() == 0) {
 					System.out.println("비밀번호를 입력해주세요.");
+					blockCnt++;
 					continue;
 				}
 				break;
