@@ -339,6 +339,58 @@ public class App {
 
 			System.out.printf("%s님 환영합니다.\n", name);
 
+		} else if (command.equals("member login")) {
+
+			System.out.println("== 회원 로그인 ==");
+
+			String loginId;
+			String loginPw;
+			SecSql sql = new SecSql();
+
+			while (true) {
+
+				System.out.print("로그인 아이디 : ");
+				loginId = input.nextLine();
+
+				if (loginId.length() == 0) {
+					System.out.println("아이디를 입력해주세요.");
+					continue;
+				}
+
+				sql.append("SELECT COUNT(*) FROM `member`");
+				sql.append("WHERE loginId = ?", loginId);
+
+				int memberCnt = DBUtil.selectRowIntValue(conn, sql);
+
+				// 해당하는 아이디가 없으면 0이 리턴되며, 이는 로그인할 아이디가 없는 것이다.
+				if (memberCnt == 0) {
+					System.out.println("아이디가 존재하지 않습니다.");
+					continue;
+				}
+				break;
+
+			}
+
+			while (true) {
+				System.out.print("로그인 비밀번호 : ");
+				loginPw = input.nextLine();
+
+				if (loginPw.length() == 0) {
+					System.out.println("비밀번호를 입력해주세요.");
+					continue;
+				}
+				break;
+			}
+
+			// 등록된 회원의 비밀번호와 입력한 비밀번호가 일치하는지 확인해야함
+			// Member 인스턴스를 만들어서 비밀번호값을 조회합니다.
+			sql = new SecSql();
+			sql.append("SELECT * FROM article");
+			sql.append("WHERE loginId = ?", loginId);
+
+			Map<String, Object> memberMap = DBUtil.selectRow(conn, sql);
+			Member member = new Member(memberMap);
+
 		} else {
 			System.out.println("잘못된 명령어입니다.");
 		}
