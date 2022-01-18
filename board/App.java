@@ -391,6 +391,13 @@ public class App {
 			Map<String, Object> memberMap = DBUtil.selectRow(conn, sql);
 			Member member = new Member(memberMap);
 
+			if (!member.loginPw.equals(loginPw)) {
+				System.out.println("비밀번호가 일치하지 않습니다.");
+				return 0;
+			}
+
+			System.out.printf("%s님 환영합니다.\n", member.name);
+
 		} else {
 			System.out.println("잘못된 명령어입니다.");
 		}
