@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
+import board.session.Session;
 import board.util.DBUtil;
 import board.util.SecSql;
 
@@ -19,6 +20,7 @@ public class App {
 		Scanner input = new Scanner(System.in);
 
 		Connection conn = null;
+		Session session = new Session();
 
 		try {
 			Class.forName("com.mysql.cj.jdbc.Driver"); // Mysql JDBC 드라이버 로딩
@@ -38,7 +40,7 @@ public class App {
 					continue;
 				}
 
-				int actionResult = doAction(conn, input, command);
+				int actionResult = doAction(conn, input, command, session);
 
 				// 프로그램 종료 제어
 				if (actionResult == -1) {
@@ -61,7 +63,7 @@ public class App {
 		}
 	}
 
-	private int doAction(Connection conn, Scanner input, String command) {
+	private int doAction(Connection conn, Scanner input, String command, Session session) {
 
 		if (command.equals("system exit")) {
 			System.out.println("== 프로그램 종료 ==");
@@ -384,6 +386,7 @@ public class App {
 			}
 
 			blockCnt = 0;
+			Member member;
 
 			while (true) {
 
@@ -400,24 +403,29 @@ public class App {
 					blockCnt++;
 					continue;
 				}
+
+				// 등록된 회원의 비밀번호와 입력한 비밀번호가 일치하는지 확인해야함
+				// Member 인스턴스를 만들어서 비밀번호값을 조회합니다.
+				sql = new SecSql();
+				sql.append("SELECT * FROM `member`");
+				sql.append("WHERE loginId = ?", loginId);
+
+				Map<String, Object> memberMap = DBUtil.selectRow(conn, sql);
+				member = new Member(memberMap);
+
+				if (!member.loginPw.equals(loginPw)) {
+					System.out.println("비밀번호가 일치하지 않습니다.");
+					blockCnt++;
+					continue;
+				}
 				break;
-			}
 
-			// 등록된 회원의 비밀번호와 입력한 비밀번호가 일치하는지 확인해야함
-			// Member 인스턴스를 만들어서 비밀번호값을 조회합니다.
-			sql = new SecSql();
-			sql.append("SELECT * FROM article");
-			sql.append("WHERE loginId = ?", loginId);
-
-			Map<String, Object> memberMap = DBUtil.selectRow(conn, sql);
-			Member member = new Member(memberMap);
-
-			if (!member.loginPw.equals(loginPw)) {
-				System.out.println("비밀번호가 일치하지 않습니다.");
-				return 0;
 			}
 
 			System.out.printf("%s님 환영합니다.\n", member.name);
+
+			session.loginedMemberId = member.id;
+			session.loginMember = member;
 
 		} else {
 			System.out.println("잘못된 명령어입니다.");
