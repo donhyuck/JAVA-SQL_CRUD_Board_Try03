@@ -1,25 +1,27 @@
 package board.controller;
 
 import java.sql.Connection;
-import java.util.Map;
 import java.util.Scanner;
 
-import board.Member;
+import board.dto.Member;
+import board.service.MemberService;
 import board.session.Session;
-import board.util.DBUtil;
-import board.util.SecSql;
 
 public class MemberController {
-	Connection conn;
+
 	Scanner input;
 	String command;
 	Session session;
 
+	MemberService memberService;
+
 	public MemberController(Connection conn, Scanner input, String command, Session session) {
-		this.conn = conn;
 		this.input = input;
 		this.command = command;
 		this.session = session;
+
+		// scanner, command,session은 컨트롤러 영역에서 처리하는 것이 적절하다.
+		memberService = new MemberService(conn);
 	}
 
 	public void doLogin() {
@@ -28,14 +30,11 @@ public class MemberController {
 
 		String loginId;
 		String loginPw;
-		SecSql sql;
 
 		// 로그인 입력횟수 제한
 		int blockCnt = 0;
 
 		while (true) {
-
-			sql = new SecSql();
 
 			if (blockCnt >= 3) {
 				System.out.println("입력횟수 초과! 다시 시도해주세요.");
@@ -51,10 +50,7 @@ public class MemberController {
 				continue;
 			}
 
-			sql.append("SELECT COUNT(*) FROM `member`");
-			sql.append("WHERE loginId = ?", loginId);
-
-			int memberCnt = DBUtil.selectRowIntValue(conn, sql);
+			int memberCnt = memberService.getMemberCntByLoginId(loginId);
 
 			if (memberCnt == 0) {
 				System.out.println("아이디가 존재하지 않습니다.");
@@ -85,12 +81,7 @@ public class MemberController {
 			}
 
 			// 등록된 회원의 비밀번호와 입력한 비밀번호가 일치하는지 확인해야함
-			sql = new SecSql();
-			sql.append("SELECT * FROM `member`");
-			sql.append("WHERE loginId = ?", loginId);
-
-			Map<String, Object> memberMap = DBUtil.selectRow(conn, sql);
-			member = new Member(memberMap);
+			member = memberService.getMemberByLoginId(loginId);
 
 			if (!member.loginPw.equals(loginPw)) {
 				System.out.println("비밀번호가 일치하지 않습니다.");
@@ -117,14 +108,10 @@ public class MemberController {
 		String loginPwConfirm;
 		String name;
 
-		SecSql sql;
-
 		// 입력횟수 제한, 3회 틀릴시 다시 명령어 입력받기
 		int blockCnt = 0;
 
 		while (true) {
-
-			sql = new SecSql();
 
 			if (blockCnt >= 3) {
 				System.out.println("입력횟수 초과! 다시 시도해주세요.");
@@ -140,11 +127,7 @@ public class MemberController {
 				continue;
 			}
 
-			// DB에 등록된 아이디를 조회, 아이디 중복방지
-			sql.append("SELECT COUNT(*) FROM `member`");
-			sql.append("WHERE loginId = ?", loginId);
-
-			int memberCnt = DBUtil.selectRowIntValue(conn, sql);
+			int memberCnt = memberService.getMemberCntByLoginId(loginId);
 
 			if (memberCnt > 0) {
 				System.out.println("이미 존재하는 아이디입니다.");
@@ -207,16 +190,7 @@ public class MemberController {
 
 		}
 
-		sql = new SecSql();
-
-		sql.append("INSERT INTO `member`");
-		sql.append("SET regDate = NOW()");
-		sql.append(", updateDate = NOW()");
-		sql.append(", loginId = ?", loginId);
-		sql.append(", loginPw = ?", loginPw);
-		sql.append(", name = ?", name);
-
-		DBUtil.insert(conn, sql);
+		memberService.doJoin(loginId, loginPw, name);
 
 		System.out.printf("%s님 환영합니다.\n", name);
 

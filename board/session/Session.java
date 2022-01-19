@@ -1,6 +1,6 @@
 package board.session;
 
-import board.Member;
+import board.dto.Member;
 
 public class Session {
 

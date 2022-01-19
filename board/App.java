@@ -3,16 +3,11 @@ package board;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
 
 import board.controller.ArticleController;
 import board.controller.MemberController;
 import board.session.Session;
-import board.util.DBUtil;
-import board.util.SecSql;
 
 public class App {
 
