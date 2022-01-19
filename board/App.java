@@ -427,6 +427,28 @@ public class App {
 			session.loginedMemberId = member.id;
 			session.loginMember = member;
 
+		} else if (command.equals("member logout")) {
+
+			if (session.loginMember == null) {
+				System.out.println("현재 로그아웃 상태입니다.");
+				return 0;
+			}
+
+			System.out.printf("%s님 로그아웃되었습니다.\n", session.loginMember.name);
+			session.loginMember = null;
+			session.loginedMemberId = -1;
+
+		} else if (command.equals("member whoami")) {
+
+			if (session.loginMember == null) {
+				System.out.println("현재 로그아웃 상태입니다.");
+				return 0;
+			}
+
+			System.out.println("== 회원로그인 정보 ==");
+			System.out.printf(" 아이디: %s\n", session.loginMember.loginId);
+			System.out.printf(" 이 름 : %s\n", session.loginMember.name);
+
 		} else {
 			System.out.println("잘못된 명령어입니다.");
 		}
