@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.util.Scanner;
 
 import board.controller.ArticleController;
+import board.controller.Controller;
 import board.controller.MemberController;
 import board.session.Session;
 
@@ -34,14 +35,37 @@ public class App {
 
 				if (command.length() == 0) {
 					continue;
-				}
 
-				int actionResult = doAction(conn, input, command, session);
-
-				// 프로그램 종료 제어
-				if (actionResult == -1) {
+				} else if (command.equals("system exit")) {
+					System.out.println("== 프로그램 종료 ==");
 					break;
 				}
+
+				// 프론트 컨트롤러 작성
+				String[] commandBits = command.split(" ");
+
+				if (commandBits.length < 2) {
+					System.out.println("존재하지 않는 명령어입니다.");
+					continue;
+				}
+
+				// 명령어 앞 글자를 통해 해당하는 컨트롤러로 넘겨준다.
+				String controllerName = commandBits[0];
+
+				Controller controller = null;
+				ArticleController articleController = new ArticleController(conn, input, command, session);
+				MemberController memberController = new MemberController(conn, input, command, session);
+
+				if (controllerName.equals("article")) {
+					controller = articleController;
+				} else if (controllerName.equals("member")) {
+					controller = memberController;
+				} else {
+					System.out.println("존재하지 않는 명령어입니다.");
+					continue;
+				}
+
+				controller.doAction();
 			}
 
 		} catch (ClassNotFoundException e) {
@@ -58,56 +82,4 @@ public class App {
 			}
 		}
 	}
-
-	private int doAction(Connection conn, Scanner input, String command, Session session) {
-
-		ArticleController articleController = new ArticleController(conn, input, command, session);
-		MemberController memberController = new MemberController(conn, input, command, session);
-
-		if (command.equals("system exit")) {
-			System.out.println("== 프로그램 종료 ==");
-			return -1;
-
-		} else if (command.equals("article write")) {
-
-			articleController.doWrite();
-
-		} else if (command.equals("article list")) {
-
-			articleController.showList();
-
-		} else if (command.startsWith("article modify ")) {
-
-			articleController.doModify();
-
-		} else if (command.startsWith("article delete ")) {
-
-			articleController.doDelete();
-
-		} else if (command.startsWith("article detail ")) {
-
-			articleController.showDetail();
-
-		} else if (command.equals("member join")) {
-
-			memberController.doJoin();
-
-		} else if (command.equals("member login")) {
-
-			memberController.doLogin();
-
-		} else if (command.equals("member logout")) {
-
-			memberController.doLogout();
-
-		} else if (command.equals("member whoami")) {
-
-			memberController.showWhoami();
-
-		} else {
-			System.out.println("잘못된 명령어입니다.");
-		}
-		return 0;
-	}
-
 }

@@ -7,24 +7,38 @@ import board.dto.Member;
 import board.service.MemberService;
 import board.session.Session;
 
-public class MemberController {
+public class MemberController extends Controller {
 
-	Scanner input;
-	String command;
-	Session session;
+	private Scanner input;
+	private String command;
+	private Session session;
 
-	MemberService memberService;
+	private MemberService memberService;
 
 	public MemberController(Connection conn, Scanner input, String command, Session session) {
 		this.input = input;
 		this.command = command;
 		this.session = session;
 
-		// scanner, command,session은 컨트롤러 영역에서 처리하는 것이 적절하다.
 		memberService = new MemberService(conn);
 	}
 
-	public void doLogin() {
+	@Override
+	public void doAction() {
+		if (command.equals("member join")) {
+			doJoin();
+		} else if (command.equals("member login")) {
+			doLogin();
+		} else if (command.equals("member logout")) {
+			doLogout();
+		} else if (command.equals("member whoami")) {
+			showWhoami();
+		} else {
+			System.out.println("존재하지 않는 명령어입니다.");
+		}
+	}
+
+	private void doLogin() {
 
 		System.out.println("== 회원 로그인 ==");
 
@@ -99,7 +113,7 @@ public class MemberController {
 
 	}
 
-	public void doJoin() {
+	private void doJoin() {
 
 		System.out.println("== 회원가입 ==");
 
@@ -196,7 +210,7 @@ public class MemberController {
 
 	}
 
-	public void doLogout() {
+	private void doLogout() {
 
 		if (session.loginMember == null) {
 			System.out.println("현재 로그아웃 상태입니다.");
@@ -209,7 +223,7 @@ public class MemberController {
 
 	}
 
-	public void showWhoami() {
+	private void showWhoami() {
 
 		if (session.loginMember == null) {
 			System.out.println("현재 로그아웃 상태입니다.");
