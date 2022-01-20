@@ -37,8 +37,11 @@ public class ArticleDao {
 	public Article getArticle(int id) {
 
 		SecSql sql = new SecSql();
-		sql.append("SELECT * FROM article");
-		sql.append("WHERE id = ?", id);
+		sql.append("SELECT a.*, m.name AS extra_writer");
+		sql.append("FROM article AS a");
+		sql.append("LEFT JOIN `member` AS m");
+		sql.append("ON a.memberId = m.id");
+		sql.append("WHERE a.id = ?", id);
 
 		Map<String, Object> articleMap = DBUtil.selectRow(conn, sql);
 
@@ -55,12 +58,13 @@ public class ArticleDao {
 		return DBUtil.selectRowIntValue(conn, sql);
 	}
 
-	public int doWrite(String title, String body) {
+	public int doWrite(String title, String body, int loginedMemberId) {
 
 		SecSql sql = new SecSql();
 		sql.append("INSERT INTO article");
 		sql.append("SET regDate = NOW()");
 		sql.append(", updateDate = NOW()");
+		sql.append(", memberId = ?", loginedMemberId);
 		sql.append(", title = ?", title);
 		sql.append(", body = ?", body);
 

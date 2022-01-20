@@ -26,8 +26,8 @@ public class ArticleService {
 		return articleDao.getArticlesCntById(id);
 	}
 
-	public int doWrite(String title, String body) {
-		return articleDao.doWrite(title, body);
+	public int doWrite(String title, String body, int loginedMemberId) {
+		return articleDao.doWrite(title, body, loginedMemberId);
 	}
 
 	public void doModify(String title, String body, int id) {

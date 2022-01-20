@@ -41,4 +41,17 @@ DESC `member`;
 
 # 해당하는 아이디가 있으면 1, 없으면 0 (아이디 중복방지)
 SELECT COUNT(*) FROM `member`
-WHERE loginId = 'test1'; 
+WHERE loginId = 'test3'; 
+
+SELECT * FROM `member`;
+
+ALTER TABLE article ADD COLUMN memberId INT(10) UNSIGNED NOT NULL AFTER updateDate;
+
+DESC article;
+SELECT * FROM article;
+
+SELECT a.*, m.name AS extra_writer
+FROM article AS a
+LEFT JOIN `member` AS m
+ON a.memberId = m.id
+WHERE a.id = 1;

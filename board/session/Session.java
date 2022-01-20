@@ -5,10 +5,11 @@ import board.dto.Member;
 public class Session {
 
 	private int loginedMemberId;
-	private Member loginMember;
+	private Member loginedMember;
 
 	public Session() {
 		loginedMemberId = -1;
+		loginedMember = null;
 	}
 
 	public int getLoginedMemberId() {
@@ -19,11 +20,11 @@ public class Session {
 		this.loginedMemberId = loginedMemberId;
 	}
 
-	public Member getLoginMember() {
-		return loginMember;
+	public Member getLoginedMember() {
+		return loginedMember;
 	}
 
-	public void setLoginMember(Member loginMember) {
-		this.loginMember = loginMember;
+	public void setLoginedMember(Member loginedMember) {
+		this.loginedMember = loginedMember;
 	}
 }

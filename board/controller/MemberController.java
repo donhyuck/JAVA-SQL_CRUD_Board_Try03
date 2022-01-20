@@ -109,7 +109,7 @@ public class MemberController extends Controller {
 		System.out.printf("%s님 환영합니다.\n", member.getName());
 
 		session.setLoginedMemberId(member.getId());
-		session.setLoginMember(member);
+		session.setLoginedMember(member);
 
 	}
 
@@ -212,27 +212,27 @@ public class MemberController extends Controller {
 
 	private void doLogout() {
 
-		if (session.getLoginMember() == null) {
+		if (session.getLoginedMember() == null) {
 			System.out.println("현재 로그아웃 상태입니다.");
 			return;
 		}
 
-		System.out.printf("%s님 로그아웃되었습니다.\n", session.getLoginMember().getName());
-		session.setLoginMember(null);
+		System.out.printf("%s님 로그아웃되었습니다.\n", session.getLoginedMember().getName());
+		session.setLoginedMember(null);
 		session.setLoginedMemberId(-1);
 
 	}
 
 	private void showWhoami() {
 
-		if (session.getLoginMember() == null) {
+		if (session.getLoginedMember() == null) {
 			System.out.println("현재 로그아웃 상태입니다.");
 			return;
 		}
 
 		System.out.println("== 회원로그인 정보 ==");
-		System.out.printf(" 아이디: %s\n", session.getLoginMember().getLoginId());
-		System.out.printf(" 이 름 : %s\n", session.getLoginMember().getName());
+		System.out.printf(" 아이디: %s\n", session.getLoginedMember().getLoginId());
+		System.out.printf(" 이 름 : %s\n", session.getLoginedMember().getName());
 
 	}
 
