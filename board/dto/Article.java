@@ -4,11 +4,12 @@ import java.time.LocalDateTime;
 import java.util.Map;
 
 public class Article {
-	public int id;
-	public LocalDateTime regDate;
-	public LocalDateTime updateDate;
-	public String title;
-	public String body;
+	
+	private int id;
+	private LocalDateTime regDate;
+	private LocalDateTime updateDate;
+	private String title;
+	private String body;
 
 	public Article(int id, LocalDateTime regDate, LocalDateTime updateDate, String title, String body) {
 		this.id = id;

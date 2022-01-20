@@ -97,7 +97,7 @@ public class MemberController extends Controller {
 			// 등록된 회원의 비밀번호와 입력한 비밀번호가 일치하는지 확인해야함
 			member = memberService.getMemberByLoginId(loginId);
 
-			if (!member.loginPw.equals(loginPw)) {
+			if (!member.getLoginPw().equals(loginPw)) {
 				System.out.println("비밀번호가 일치하지 않습니다.");
 				blockCnt++;
 				continue;
@@ -106,9 +106,9 @@ public class MemberController extends Controller {
 
 		}
 
-		System.out.printf("%s님 환영합니다.\n", member.name);
+		System.out.printf("%s님 환영합니다.\n", member.getName());
 
-		session.setLoginedMemberId(member.id);
+		session.setLoginedMemberId(member.getId());
 		session.setLoginMember(member);
 
 	}
@@ -217,7 +217,7 @@ public class MemberController extends Controller {
 			return;
 		}
 
-		System.out.printf("%s님 로그아웃되었습니다.\n", session.getLoginMember().name);
+		System.out.printf("%s님 로그아웃되었습니다.\n", session.getLoginMember().getName());
 		session.setLoginMember(null);
 		session.setLoginedMemberId(-1);
 
@@ -231,8 +231,8 @@ public class MemberController extends Controller {
 		}
 
 		System.out.println("== 회원로그인 정보 ==");
-		System.out.printf(" 아이디: %s\n", session.getLoginMember().loginId);
-		System.out.printf(" 이 름 : %s\n", session.getLoginMember().name);
+		System.out.printf(" 아이디: %s\n", session.getLoginMember().getLoginId());
+		System.out.printf(" 이 름 : %s\n", session.getLoginMember().getName());
 
 	}
 

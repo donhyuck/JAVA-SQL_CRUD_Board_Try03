@@ -7,12 +7,12 @@ import java.util.Map;
 // Member 객체에서 데이터를 형태에 맞게 조정해줍니다.
 public class Member {
 
-	public int id;
-	public LocalDateTime regDate;
-	public LocalDateTime updateDate;
-	public String loginId;
-	public String loginPw;
-	public String name;
+	private int id;
+	private LocalDateTime regDate;
+	private LocalDateTime updateDate;
+	private String loginId;
+	private String loginPw;
+	private String name;
 
 	public Member(int id, LocalDateTime regDate, LocalDateTime updateDate, String loginId, String loginPw,
 			String name) {
