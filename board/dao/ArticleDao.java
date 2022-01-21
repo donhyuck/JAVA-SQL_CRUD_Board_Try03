@@ -95,4 +95,14 @@ public class ArticleDao {
 
 		DBUtil.delete(conn, sql);
 	}
+
+	public void increaseHit(int id) {
+
+		SecSql sql = new SecSql();
+		sql.append("UPDATE article");
+		sql.append("SET hit = hit + 1");
+		sql.append("WHERE id = ?", id);
+
+		DBUtil.update(conn, sql);
+	}
 }

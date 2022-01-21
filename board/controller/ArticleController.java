@@ -176,6 +176,8 @@ public class ArticleController extends Controller {
 			return;
 		}
 
+		articleService.increaseHit(id);
+
 		Article article = articleService.getArticle(id);
 
 		System.out.printf("== %d번 게시글 조회 ==\n", id);
@@ -185,6 +187,7 @@ public class ArticleController extends Controller {
 		System.out.printf(" 작성자  : %s\n", article.getExtra_writer());
 		System.out.printf(" 제 목  : %s\n", article.getTitle());
 		System.out.printf(" 내 용  : %s\n", article.getBody());
-
+		System.out.printf(" 조회수  : %d\n", article.getHit());
+		
 	}
 }
