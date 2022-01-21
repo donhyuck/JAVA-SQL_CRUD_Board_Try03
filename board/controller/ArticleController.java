@@ -103,6 +103,14 @@ public class ArticleController extends Controller {
 			return;
 		}
 
+		// 게시글의 작성자를 파악해서 그 사람만 수정, 삭제하도록
+		Article article = articleService.getArticle(id);
+
+		if (article.getMemberId() != session.getLoginedMemberId()) {
+			System.out.printf("%s님은 %d번 게시글에 대한 권한이 없습니다.\n", session.getLoginedMember().getName(), id);
+			return;
+		}
+
 		System.out.println("== 게시글 수정 ==");
 		System.out.print("새 제목 : ");
 		String title = input.nextLine();
@@ -134,6 +142,14 @@ public class ArticleController extends Controller {
 
 		if (foundArticleId == 0) {
 			System.out.printf("%d번 게시글이 존재하지 않습니다.\n", id);
+			return;
+		}
+
+		// 게시글의 작성자를 파악해서 그 사람만 수정, 삭제하도록
+		Article article = articleService.getArticle(id);
+
+		if (article.getMemberId() != session.getLoginedMemberId()) {
+			System.out.printf("%s님은 %d번 게시글에 대한 권한이 없습니다.\n", session.getLoginedMember().getName(), id);
 			return;
 		}
 
