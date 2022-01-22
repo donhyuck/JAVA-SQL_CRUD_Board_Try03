@@ -70,6 +70,7 @@ public class ArticleDao {
 		sql.append(", memberId = ?", loginedMemberId);
 		sql.append(", title = ?", title);
 		sql.append(", body = ?", body);
+		sql.append(", hit = 0");
 
 		return DBUtil.insert(conn, sql);
 	}
@@ -104,5 +105,26 @@ public class ArticleDao {
 		sql.append("WHERE id = ?", id);
 
 		DBUtil.update(conn, sql);
+	}
+
+	public List<Article> getArticlesByKeyword(String searchKeyword) {
+
+		SecSql sql = new SecSql();
+		sql.append("SELECT a.*, m.name AS extra_writer");
+		sql.append("FROM article AS a");
+		sql.append("LEFT JOIN `member` AS m");
+		sql.append("ON a.memberId = m.id");
+		sql.append("WHERE a.title LIKE CONCAT('%',?,'%')", searchKeyword);
+		sql.append("ORDER BY a.id DESC");
+
+		List<Map<String, Object>> articleListMap = DBUtil.selectRows(conn, sql);
+
+		List<Article> articles = new ArrayList<>();
+
+		for (Map<String, Object> articleMap : articleListMap) {
+			articles.add(new Article(articleMap));
+		}
+		
+		return articles;
 	}
 }

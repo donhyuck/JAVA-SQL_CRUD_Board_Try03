@@ -41,4 +41,8 @@ public class ArticleService {
 	public void increaseHit(int id) {
 		articleDao.increaseHit(id);
 	}
+
+	public List<Article> getArticlesByKeyword(String searchKeyword) {
+		return articleDao.getArticlesByKeyword(searchKeyword);
+	}
 }

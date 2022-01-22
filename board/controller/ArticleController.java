@@ -28,7 +28,7 @@ public class ArticleController extends Controller {
 
 		if (command.equals("article write")) {
 			doWrite();
-		} else if (command.equals("article list")) {
+		} else if (command.startsWith("article list")) {
 			showList();
 		} else if (command.startsWith("article modify ")) {
 			doModify();
@@ -65,7 +65,25 @@ public class ArticleController extends Controller {
 
 	private void showList() {
 
-		List<Article> articles = articleService.getArticles();
+		String[] cmdBits = command.split(" ");
+		String SearchKeyword = "";
+		List<Article> articles;
+
+		// article list ??? -> 검색어가 있는 경우
+		// articles를 검색된 게시글로 선언한다.
+		if (cmdBits.length > 2) {
+			SearchKeyword = command.substring("article list ".length());
+			articles = articleService.getArticlesByKeyword(SearchKeyword);
+		}
+
+		// 검색어가 없는 경우 모든 글을 출력
+		else {
+			if (command.length() != 12) {
+				System.out.println("잘못된 명령어입니다.");
+				return;
+			}
+			articles = articleService.getArticles();
+		}
 
 		if (articles.size() == 0) {
 			System.out.println("게시글이 존재하지 않습니다.");
@@ -188,6 +206,6 @@ public class ArticleController extends Controller {
 		System.out.printf(" 제 목  : %s\n", article.getTitle());
 		System.out.printf(" 내 용  : %s\n", article.getBody());
 		System.out.printf(" 조회수  : %d\n", article.getHit());
-		
+
 	}
 }
