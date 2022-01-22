@@ -26,20 +26,29 @@ public class ArticleController extends Controller {
 	@Override
 	public void doAction() {
 
-		if (command.equals("article write")) {
-			doWrite();
-		} else if (command.startsWith("article list")) {
-			showList();
-		} else if (command.startsWith("article modify ")) {
-			doModify();
-		} else if (command.startsWith("article delete ")) {
-			doDelete();
-		} else if (command.startsWith("article detail ")) {
-			showDetail();
-		} else {
-			System.out.println("존재하지 않는 명령어입니다.");
-		}
+		String[] cmdBits = command.split(" ");
+		String actionMethodName = cmdBits[1];
 
+		switch (actionMethodName) {
+		case "write":
+			doWrite();
+			break;
+		case "list":
+			showList();
+			break;
+		case "modify":
+			doModify();
+			break;
+		case "delete":
+			doDelete();
+			break;
+		case "detail":
+			showDetail();
+			break;
+		default:
+			System.out.println("존재하지 않는 명령어입니다.");
+			break;
+		}
 	}
 
 	private void doWrite() {

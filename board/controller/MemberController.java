@@ -25,15 +25,24 @@ public class MemberController extends Controller {
 
 	@Override
 	public void doAction() {
-		if (command.equals("member join")) {
+
+		String[] cmdBits = command.split(" ");
+		String actionMethodName = cmdBits[1];
+
+		switch (actionMethodName) {
+		case "join":
 			doJoin();
-		} else if (command.equals("member login")) {
+			break;
+		case "login":
 			doLogin();
-		} else if (command.equals("member logout")) {
+			break;
+		case "logout":
 			doLogout();
-		} else if (command.equals("member whoami")) {
+			break;
+		case "whoami":
 			showWhoami();
-		} else {
+			break;
+		default:
 			System.out.println("존재하지 않는 명령어입니다.");
 		}
 	}
