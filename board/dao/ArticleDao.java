@@ -143,4 +143,52 @@ public class ArticleDao {
 
 		return DBUtil.selectRowIntValue(conn, sql);
 	}
+
+	public void insertLike(int id, int likeType, int loginedMemberId) {
+
+		SecSql sql = new SecSql();
+		sql.append("INSERT INTO `like`");
+		sql.append("SET regDate = NOW()");
+		sql.append(", updateDate = NOW()");
+		sql.append(", articleId = ?", id);
+		sql.append(", memberId = ?", loginedMemberId);
+		sql.append(", likeType = ?", likeType);
+
+		DBUtil.insert(conn, sql);
+	}
+
+	public int likeCheck(int id, int loginedMemberId) {
+
+		SecSql sql = new SecSql();
+		sql.append("SELECT");
+		sql.append("CASE WHEN COUNT(*) != 0");
+		sql.append("THEN likeType ELSE 0 END");
+		sql.append("FROM `like`");
+		sql.append("WHERE articleId = ? AND memberId = ?", id, loginedMemberId);
+
+		return DBUtil.selectRowIntValue(conn, sql);
+	}
+
+	public void deleteLike(int id, int loginedMemberId) {
+
+		SecSql sql = new SecSql();
+
+		sql.append("DELETE FROM `like`");
+		sql.append("WHERE articleId = ?", id);
+		sql.append("AND memberId = ?", loginedMemberId);
+
+		DBUtil.delete(conn, sql);
+	}
+
+	public void modifyLike(int id, int likeType, int loginedMemberId) {
+
+		SecSql sql = new SecSql();
+		sql.append("UPDATE `like`");
+		sql.append("SET updateDate = NOW()");
+		sql.append(", likeType = ?", likeType);
+		sql.append("WHERE articleId = ?", id);
+		sql.append("AND memberId = ?", loginedMemberId);
+
+		DBUtil.update(conn, sql);
+	}
 }

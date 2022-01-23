@@ -45,9 +45,91 @@ public class ArticleController extends Controller {
 		case "detail":
 			showDetail();
 			break;
+		case "like":
+			doLike();
+			break;
 		default:
 			System.out.println("존재하지 않는 명령어입니다.");
 			break;
+		}
+	}
+
+	private void doLike() {
+		if (session.getLoginedMember() == null) {
+			System.out.println("로그인 후 이용해주세요.");
+			return;
+		}
+
+		boolean isInt = command.split(" ")[2].matches("-?\\d+");
+
+		if (!isInt) {
+			System.out.println("게시글의 ID는 숫자로 입력해주세요.");
+			return;
+		}
+
+		int id = Integer.parseInt(command.split(" ")[2].trim());
+
+		int foundArticleId = articleService.getArticlesCntById(id);
+
+		if (foundArticleId == 0) {
+			System.out.printf("%d번 게시글이 존재하지 않습니다.\n", id);
+			return;
+		}
+
+		System.out.println("== 게시글 추천/비추천 ==");
+		System.out.println(">> [추천] 1 , [비추천] 2 , [해제] 3 , [나가기] 0");
+		System.out.print("[article like] 명령어 : ");
+		int likeType = input.nextInt();
+		input.nextLine();
+
+		if (likeType == 0) {
+			System.out.println("[article like] 종료");
+			return;
+		}
+
+		String msg = (likeType == 1 ? "추천" : "비추천");
+		// 추천/비추천 일 경우 두번씩 처리 되는 것을 방지
+		int likeCheck = articleService.likeCheck(id, session.getLoginedMemberId());
+
+		// 추천,비추천이 없음
+		if (likeCheck == 0) {
+
+			if (likeType == 1 || likeType == 2) {
+				articleService.insertLike(id, likeType, session.getLoginedMemberId());
+
+				System.out.printf("%d번 게시글 : %s완료\n", id, msg);
+			}
+
+			// 추천/비추천한 상태에서 해제 : 추천/비추천 해제
+			// 이미 해제된 상태(likeCheck = 0)에서 3번 : 해제할 추천/비추천이 없습니다.
+			else if (likeType == 3) {
+				System.out.println("해제할 추천/비추천이 없습니다.");
+			} else {
+				System.out.println("잘못된 명령어입니다. 0 ~ 3까지의 수만 입력해주세요");
+			}
+		}
+
+		// likeCheck => 1 : 추천, 2 : 비추천
+		else {
+			if (likeType == 3) {
+				articleService.deleteLike(id, session.getLoginedMemberId());
+				System.out.printf("%s을 취소합니다.\n", msg);
+				return;
+			}
+
+			// 추천/비추천 이미 완료된 경우
+			// 명령된 likeType과 추천/비추천 여부 비교
+			// 추천 -> 추천, 비추천 -> 비추천 : 이미 추천/비추천 했습니다.
+			if (likeType == likeCheck) {
+				System.out.printf("이미 %s했습니다.\n", msg);
+				return;
+			}
+
+			// 추천 -> 비추천, 비추천 -> 추천 : 추천변경
+			else {
+				articleService.modifyLike(id, likeType, session.getLoginedMemberId());
+				System.out.printf("%s으로 변경완료\n", msg);
+			}
 		}
 	}
 

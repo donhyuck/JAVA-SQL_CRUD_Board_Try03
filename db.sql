@@ -55,3 +55,52 @@ FROM article AS a
 LEFT JOIN `member` AS m
 ON a.memberId = m.id
 WHERE a.id = 1;
+
+## 검색어와 일치하는 게시글 출력
+SELECT a.*, m.name AS extra_writer
+FROM article AS a
+LEFT JOIN `member` AS m
+ON a.memberId = m.id
+WHERE a.title LIKE '%t%';
+
+INSERT INTO article
+SET regDate = NOW(),
+updateDate = NOW(),
+memberId = 1,
+title = "제목6",
+`body` = "내용6",
+hit = 25;
+
+SELECT * FROM article;
+
+## 게시글 페이징 구현
+SELECT a.*, m.name AS extra_writer
+FROM article AS a
+LEFT JOIN `member` AS m
+ON a.memberId = m.id
+ORDER BY a.id DESC
+LIMIT 64,5;
+
+DROP TABLE `like`;
+## like 테이블 생성
+## liketype = 1 추천 / liketype = 2 비추천
+CREATE TABLE `like` (
+	id INT(10)  UNSIGNED NOT NULL AUTO_INCREMENT,
+	PRIMARY KEY(id),
+	regDate DATETIME NOT NULL,
+	updateDate DATETIME NOT NULL,
+	articleId INT(10) UNSIGNED NOT NULL,
+	memberId INT(10) UNSIGNED NOT NULL,
+	likeType TINYINT(1) NOT NULL
+);
+
+SELECT * FROM `like`;
+
+# like했는지 체크 -> case when 사용
+# 추천/비추천 했다면 해당하는 likeType 값 리턴
+# 추천/비추천 안했다면 0리턴 
+SELECT
+CASE WHEN COUNT(*) != 0
+THEN likeType ELSE 0 END
+FROM `like`
+WHERE articleId = 12 AND memberId = 2;

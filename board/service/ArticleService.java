@@ -53,4 +53,20 @@ public class ArticleService {
 	public int getArticlesCnt(String searchKeyword) {
 		return articleDao.getArticlesCnt(searchKeyword);
 	}
+
+	public void insertLike(int id, int likeType, int loginedMemberId) {
+		articleDao.insertLike(id, likeType, loginedMemberId);
+	}
+
+	public int likeCheck(int id, int loginedMemberId) {
+		return articleDao.likeCheck(id, loginedMemberId);
+	}
+
+	public void deleteLike(int id, int loginedMemberId) {
+		articleDao.deleteLike(id, loginedMemberId);
+	}
+
+	public void modifyLike(int id, int likeType, int loginedMemberId) {
+		articleDao.modifyLike(id, likeType, loginedMemberId);
+	}
 }
