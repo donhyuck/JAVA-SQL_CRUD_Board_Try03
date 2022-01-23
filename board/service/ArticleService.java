@@ -14,8 +14,10 @@ public class ArticleService {
 		articleDao = new ArticleDao(conn);
 	}
 
-	public List<Article> getArticles() {
-		return articleDao.getArticles();
+	public List<Article> getArticles(int page, int itemsInAPage) {
+		int limitFrom = (page - 1) * itemsInAPage; // ?번 게시물부터
+		int limitTake = itemsInAPage; // ?개를 한번에 보인다.
+		return articleDao.getArticles(limitFrom, limitTake);
 	}
 
 	public Article getArticle(int id) {
@@ -42,7 +44,13 @@ public class ArticleService {
 		articleDao.increaseHit(id);
 	}
 
-	public List<Article> getArticlesByKeyword(String searchKeyword) {
-		return articleDao.getArticlesByKeyword(searchKeyword);
+	public List<Article> getArticlesByKeyword(int page, int itemsInAPage, String searchKeyword) {
+		int limitFrom = (page - 1) * itemsInAPage; // ?번 게시물부터
+		int limitTake = itemsInAPage; // ?개를 한번에 보인다.
+		return articleDao.getArticlesByKeyword(limitFrom, limitTake, searchKeyword);
+	}
+
+	public int getArticlesCnt(String searchKeyword) {
+		return articleDao.getArticlesCnt(searchKeyword);
 	}
 }

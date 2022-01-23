@@ -78,31 +78,54 @@ public class ArticleController extends Controller {
 		String SearchKeyword = "";
 		List<Article> articles;
 
-		// article list ??? -> 검색어가 있는 경우
-		// articles를 검색된 게시글로 선언한다.
-		if (cmdBits.length > 2) {
-			SearchKeyword = command.substring("article list ".length());
-			articles = articleService.getArticlesByKeyword(SearchKeyword);
-		}
+		// 게시글 목록을 페이징으로 작성
+		int page = 1;
+		int itemsInAPage = 5; // 한번에 보이는 게시글 수
 
-		// 검색어가 없는 경우 모든 글을 출력
-		else {
-			if (command.length() != 12) {
-				System.out.println("잘못된 명령어입니다.");
+		while (true) {
+
+			// 검색어가 있는 경우 (article list ???)
+			if (cmdBits.length > 2) {
+				SearchKeyword = command.substring("article list ".length());
+				articles = articleService.getArticlesByKeyword(page, itemsInAPage, SearchKeyword);
+			}
+
+			// 검색어가 없는 경우 (article list) 모든 글을 출력
+			else {
+				if (command.length() != 12) {
+					System.out.println("잘못된 명령어입니다.");
+					return;
+				}
+				articles = articleService.getArticles(page, itemsInAPage);
+			}
+
+			if (articles.size() == 0) {
+				System.out.println("게시글이 존재하지 않습니다.");
 				return;
 			}
-			articles = articleService.getArticles();
-		}
 
-		if (articles.size() == 0) {
-			System.out.println("게시글이 존재하지 않습니다.");
-			return;
-		}
+			System.out.println("== 게시글 목록 ==");
 
-		System.out.println("== 게시글 목록 ==");
-		System.out.println("번호 / 제목 / 작성자");
-		for (Article article : articles) {
-			System.out.printf(" %d / %s / %s\n", article.getId(), article.getTitle(), article.getExtra_writer());
+			System.out.println("번호 / 제목 / 작성자");
+			for (Article article : articles) {
+				System.out.printf(" %d / %s / %s\n", article.getId(), article.getTitle(), article.getExtra_writer());
+			}
+
+			// 현재 페이지, 마지막 페이지, 전체 글 수
+			int articleCnt = articleService.getArticlesCnt(SearchKeyword);
+			int lastPage = (int) Math.ceil(articleCnt / (double) itemsInAPage);
+
+			System.out.printf("페이지 %d / %d, 게시글 %d건\n", page, lastPage, articleCnt);
+			System.out.println("\n== [나가기] 0이하입력 [게시글 목록 이동] 페이지입력 ==");
+			System.out.print("[article list] 명령어 : ");
+			page = input.nextInt();
+
+			input.nextLine();
+
+			if (page <= 0) {
+				System.out.println("게시글 페이지를 나갑니다.");
+				break;
+			}
 		}
 
 	}
