@@ -69,4 +69,8 @@ public class ArticleService {
 	public void modifyLike(int id, int likeType, int loginedMemberId) {
 		articleDao.modifyLike(id, likeType, loginedMemberId);
 	}
+
+	public int getLikeVal(int id, int likeType) {
+		return articleDao.getLikeVal(id, likeType);
+	}
 }

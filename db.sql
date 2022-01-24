@@ -1,6 +1,8 @@
 DROP DATABASE IF EXISTS text_board;
 
 CREATE DATABASE text_board;
+
+# DB - 게시글 작성쿼리
 USE text_board;
 
 CREATE TABLE article (
@@ -104,3 +106,10 @@ CASE WHEN COUNT(*) != 0
 THEN likeType ELSE 0 END
 FROM `like`
 WHERE articleId = 12 AND memberId = 2;
+
+SELECT * FROM article;
+
+# 추천/비추천 조회
+SELECT COUNT(*)
+FROM `like`
+WHERE articleId = 12 AND likeType = 1;
