@@ -1,6 +1,7 @@
 package board.controller;
 
 import java.sql.Connection;
+import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 
@@ -48,9 +49,108 @@ public class ArticleController extends Controller {
 		case "like":
 			doLike();
 			break;
+		case "comment":
+			doComment();
+			break;
 		default:
 			System.out.println("존재하지 않는 명령어입니다.");
 			break;
+		}
+	}
+
+	private void doComment() {
+		if (session.getLoginedMember() == null) {
+			System.out.println("로그인 후 이용해주세요.");
+			return;
+		}
+
+		boolean isInt = command.split(" ")[2].matches("-?\\d+");
+
+		if (!isInt) {
+			System.out.println("게시글의 ID는 숫자로 입력해주세요.");
+			return;
+		}
+
+		int id = Integer.parseInt(command.split(" ")[2].trim());
+
+		int foundArticleId = articleService.getArticlesCntById(id);
+
+		if (foundArticleId == 0) {
+			System.out.printf("%d번 게시글이 존재하지 않습니다.\n", id);
+			return;
+		}
+
+		System.out.printf("== %d번 게시글의 댓글 ==\n", id);
+
+		while (true) {
+
+			// 댓글 가이드
+			System.out.println(">> [댓글쓰기] 1 , [댓글수정] 2 , [댓글삭제] 3 , [댓글보기] 4, [나가기] 0");
+
+			// 명령어로 정수만 받도록
+			int commentType;
+
+			while (true) {
+				try {
+					System.out.print("[article comment] 명령어 : ");
+					commentType = new Scanner(System.in).nextInt();
+					break;
+
+				} catch (InputMismatchException e) {
+					System.out.println("article comment 수행 중 오류발생!");
+					System.out.println("정상적인 숫자를 입력해주세요.");
+				}
+			}
+
+			if (commentType == 0) {
+				System.out.println("== 댓글 종료 ==");
+				return;
+			}
+
+			if (commentType == 1) {
+				System.out.println("== 댓글 작성 ==");
+
+				System.out.print("댓글 제목 : ");
+				String commentTitle = input.nextLine();
+				System.out.print("댓글 내용 : ");
+				String commentBody = input.nextLine();
+
+				int commentId = articleService.doCommentWrite(id, commentTitle, commentBody,
+						session.getLoginedMemberId());
+
+				System.out.printf("%d번 게시글에 %d번 댓글을 작성했습니다.\n", id, commentId);
+
+			} else if (commentType == 2) {
+				System.out.println("== 댓글 수정 ==");
+				int commentId;
+
+				while (true) {
+					try {
+						System.out.print("수정할 댓글 번호 : ");
+						commentId = input.nextInt();
+
+						break;
+					} catch (InputMismatchException e) {
+						System.out.println("해당하는 댓글의 번호를 숫자로 입력해주세요.");
+					}
+				}
+
+				if (commentId == 0) {
+					continue;
+				}
+
+				int commentCnt = articleService.getCommentCntById(id, commentId);
+
+			} else if (commentType == 3) {
+				System.out.println("== 댓글 삭제 ==");
+
+			} else if (commentType == 4) {
+				System.out.println("== 댓글 페이징 ==");
+
+			} else {
+				System.out.println("가이드에 표시된 숫자만 입력하세요.");
+			}
+
 		}
 	}
 

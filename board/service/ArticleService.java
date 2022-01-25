@@ -73,4 +73,12 @@ public class ArticleService {
 	public int getLikeVal(int id, int likeType) {
 		return articleDao.getLikeVal(id, likeType);
 	}
+
+	public int doCommentWrite(int id, String commentTitle, String commentBody, int loginedMemberId) {
+		return articleDao.doCommentWrite(id, commentTitle, commentBody, loginedMemberId);
+	}
+
+	public int getCommentCntById(int id, int commentId) {
+		return articleDao.getCommentCntById(id, commentId);
+	}
 }

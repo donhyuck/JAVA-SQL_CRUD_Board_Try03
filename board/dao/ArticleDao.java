@@ -201,4 +201,28 @@ public class ArticleDao {
 
 		return DBUtil.selectRowIntValue(conn, sql);
 	}
+
+	public int doCommentWrite(int id, String commentTitle, String commentBody, int loginedMemberId) {
+
+		SecSql sql = new SecSql();
+		sql.append("INSERT INTO `comment`");
+		sql.append("SET regDate = NOW()");
+		sql.append(", updateDate = NOW()");
+		sql.append(", articleId = ?", id);
+		sql.append(", memberId = ?", loginedMemberId);
+		sql.append(", commentTitle = ?", commentTitle);
+		sql.append(", commentBody = ?", commentBody);
+
+		return DBUtil.insert(conn, sql);
+	}
+
+	public int getCommentCntById(int id, int commentId) {
+
+		SecSql sql = new SecSql();
+		sql.append("SELECT COUNT(*)");
+		sql.append("FROM `comment`");
+		sql.append("WHERE id = ? AND articleId = ?", commentId, id);
+
+		return DBUtil.selectRowIntValue(conn, sql);
+	}
 }
