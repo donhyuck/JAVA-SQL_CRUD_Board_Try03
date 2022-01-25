@@ -94,4 +94,14 @@ public class ArticleService {
 	public void doCommentDelete(int commentId) {
 		articleDao.doCommentDelete(commentId);
 	}
+
+	public List<Comment> getCommentsByPage(int id, int page, int itemsInAPage) {
+		int limitFrom = (page - 1) * itemsInAPage;
+		int limitTake = itemsInAPage;
+		return articleDao.getCommentsByPage(id, limitFrom, limitTake);
+	}
+
+	public int getCommentsCnt(int id) {
+		return articleDao.getCommentsCnt(id);
+	}
 }

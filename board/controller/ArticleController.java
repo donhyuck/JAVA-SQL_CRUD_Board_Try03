@@ -207,6 +207,46 @@ public class ArticleController extends Controller {
 			} else if (commentType == 4) {
 				System.out.println("== 댓글 페이징 ==");
 
+				int page = 1;
+				int itemsInAPage = 5;
+
+				while (true) {
+					List<Comment> pageComments = articleService.getCommentsByPage(id, page, itemsInAPage);
+
+					if (pageComments.size() == 0) {
+						System.out.println("댓글이 존재하지 않습니다.");
+						break;
+					}
+
+					for (Comment comment : pageComments) {
+						System.out.printf("[%d번] 작성자 : %s / ", comment.getId(), comment.getExtra_writer());
+						System.out.printf("제목 : %s, 내용 : %s\n", comment.getCommentTitle(), comment.getCommentBody());
+					}
+
+					// 전체 댓글 수
+					int commentsCnt = articleService.getCommentsCnt(id);
+					int lastCommentPage = (int) Math.ceil(commentsCnt / (double) itemsInAPage);
+
+					System.out.printf("페이지 %d / %d, 댓글 %d건\n", page, lastCommentPage, commentsCnt);
+					System.out.println("\n== [나가기] 0이하입력 [댓글 목록 이동] 페이지입력 ==");
+
+					while (true) {
+						try {
+							System.out.printf("[article comment page] 명령어 : ");
+							page = new Scanner(System.in).nextInt();
+
+							break;
+						} catch (InputMismatchException e) {
+							System.out.println("해당하는 페이지의 번호를 숫자로 입력해주세요.");
+						}
+					}
+
+					if (page <= 0) {
+						System.out.println("댓글 페이지 조회를 종료합니다.");
+						break;
+					}
+				}
+
 			} else {
 				System.out.println("가이드에 표시된 숫자만 입력하세요.");
 			}

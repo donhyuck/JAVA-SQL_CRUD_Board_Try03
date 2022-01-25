@@ -113,3 +113,37 @@ SELECT * FROM article;
 SELECT COUNT(*)
 FROM `like`
 WHERE articleId = 12 AND likeType = 1;
+
+# comment 테이블 삭제
+DROP TABLE `comment`;
+# comment 테이블 생성
+CREATE TABLE `comment` (
+	id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+	PRIMARY KEY(id),
+	regDate DATETIME NOT NULL,
+	updateDate DATETIME NOT NULL,
+	articleId INT(10) UNSIGNED NOT NULL,
+	memberId INT(10) UNSIGNED NOT NULL,
+	commentTitle CHAR(100) NOT NULL,
+	commentBody CHAR(100) NOT NULL
+);
+
+DESC `comment`;
+SELECT * FROM `comment`;
+
+SELECT COUNT(*)
+FROM `comment`
+WHERE id = 2 AND articleId = 13;
+
+# 댓글 페이징
+SELECT c.*,m.name AS extra_writer
+FROM `comment` c
+INNER JOIN `member` m
+ON c.memberId = m.id
+WHERE articleId = 10
+LIMIT 5,5;
+
+# 전체 댓글 수
+SELECT COUNT(*)
+FROM `comment`
+WHERE articleId = 10;
