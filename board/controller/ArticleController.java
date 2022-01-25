@@ -122,7 +122,7 @@ public class ArticleController extends Controller {
 				System.out.printf("%d번 게시글에 %d번 댓글을 작성했습니다.\n", id, commentId);
 
 			} else if (commentType == 2) {
-				
+
 				int commentId;
 
 				while (true) {
@@ -152,7 +152,7 @@ public class ArticleController extends Controller {
 				Comment comment = articleService.getCommentById(commentId);
 
 				if (comment.getMemberId() != session.getLoginedMemberId()) {
-					System.out.println("해당 댓글에 대한 수정권한이 없습니다.");
+					System.out.println("해당 댓글에 대한 접근권한이 없습니다.");
 					continue;
 				}
 
@@ -167,6 +167,42 @@ public class ArticleController extends Controller {
 
 			} else if (commentType == 3) {
 				System.out.println("== 댓글 삭제 ==");
+
+				int commentId;
+
+				while (true) {
+					try {
+						System.out.print(">> [나가기] 0 [삭제할 댓글번호] : ");
+						commentId = new Scanner(System.in).nextInt();
+
+						break;
+					} catch (InputMismatchException e) {
+						System.out.println("해당하는 댓글의 번호를 숫자로 입력해주세요.");
+					}
+				}
+
+				if (commentId == 0) {
+					continue;
+				}
+
+				// 삭제할 댓글 확인
+				int commentCnt = articleService.getCommentCntById(commentId, id);
+
+				if (commentCnt == 0) {
+					System.out.println("삭제할 댓글이 존재하지 않습니다.");
+					continue;
+				}
+
+				// 해당 댓글 작성자만 접근할 수 있도록 권한 체크
+				Comment comment = articleService.getCommentById(commentId);
+
+				if (comment.getMemberId() != session.getLoginedMemberId()) {
+					System.out.println("해당 댓글에 대한 접근권한이 없습니다.");
+					continue;
+				}
+
+				articleService.doCommentDelete(commentId);
+				System.out.printf("%d번 게시들의 %d번 댓글이 삭제되었습니다.\n", id, commentId);
 
 			} else if (commentType == 4) {
 				System.out.println("== 댓글 페이징 ==");

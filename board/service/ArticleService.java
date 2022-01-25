@@ -90,4 +90,8 @@ public class ArticleService {
 	public void doCommentModify(int commentId, String commentTitle, String commentBody) {
 		articleDao.doCommentModify(commentId, commentTitle, commentBody);
 	}
+
+	public void doCommentDelete(int commentId) {
+		articleDao.doCommentDelete(commentId);
+	}
 }
