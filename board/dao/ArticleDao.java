@@ -217,7 +217,7 @@ public class ArticleDao {
 		return DBUtil.insert(conn, sql);
 	}
 
-	public int getCommentCntById(int id, int commentId) {
+	public int getCommentCntById(int commentId, int id) {
 
 		SecSql sql = new SecSql();
 		sql.append("SELECT COUNT(*)");
@@ -230,12 +230,24 @@ public class ArticleDao {
 	public Comment getCommentById(int commentId) {
 
 		SecSql sql = new SecSql();
-		sql.append("SELECT COUNT(*)");
+		sql.append("SELECT *");
 		sql.append("FROM `comment`");
 		sql.append("WHERE id = ?", commentId);
 
 		Map<String, Object> commentMap = DBUtil.selectRow(conn, sql);
 
 		return new Comment(commentMap);
+	}
+
+	public void doCommentModify(int commentId, String commentTitle, String commentBody) {
+
+		SecSql sql = new SecSql();
+		sql.append("UPDATE `comment`");
+		sql.append("SET updateDate = NOW()");
+		sql.append(", commentTitle = ?", commentTitle);
+		sql.append(", commentBody = ?", commentBody);
+		sql.append("WHERE id  = ?", commentId);
+
+		DBUtil.update(conn, sql);
 	}
 }

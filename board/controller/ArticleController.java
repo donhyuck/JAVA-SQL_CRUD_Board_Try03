@@ -122,13 +122,13 @@ public class ArticleController extends Controller {
 				System.out.printf("%d번 게시글에 %d번 댓글을 작성했습니다.\n", id, commentId);
 
 			} else if (commentType == 2) {
-				System.out.println("== 댓글 수정 ==");
+				
 				int commentId;
 
 				while (true) {
 					try {
-						System.out.print("수정할 댓글 번호 : ");
-						commentId = input.nextInt();
+						System.out.print(">> [나가기] 0 [수정할 댓글번호] : ");
+						commentId = new Scanner(System.in).nextInt();
 
 						break;
 					} catch (InputMismatchException e) {
@@ -140,9 +140,30 @@ public class ArticleController extends Controller {
 					continue;
 				}
 
+				// 수정할 댓글 확인
+				int commentCnt = articleService.getCommentCntById(commentId, id);
+
+				if (commentCnt == 0) {
+					System.out.println("수정할 댓글이 존재하지 않습니다.");
+					continue;
+				}
+
+				// 해당 댓글 작성자만 접근할 수 있도록 권한 체크
 				Comment comment = articleService.getCommentById(commentId);
 
-				int commentCnt = articleService.getCommentCntById(id, commentId);
+				if (comment.getMemberId() != session.getLoginedMemberId()) {
+					System.out.println("해당 댓글에 대한 수정권한이 없습니다.");
+					continue;
+				}
+
+				System.out.println("== 댓글 수정 ==");
+				System.out.print("새 댓글 제목 : ");
+				String commentTitle = input.nextLine();
+				System.out.print("새 댓글 내용 : ");
+				String commentBody = input.nextLine();
+
+				articleService.doCommentModify(commentId, commentTitle, commentBody);
+				System.out.printf("%d번 게시들의 %d번 댓글이 수정되었습니다.\n", id, commentId);
 
 			} else if (commentType == 3) {
 				System.out.println("== 댓글 삭제 ==");

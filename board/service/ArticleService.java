@@ -79,11 +79,15 @@ public class ArticleService {
 		return articleDao.doCommentWrite(id, commentTitle, commentBody, loginedMemberId);
 	}
 
-	public int getCommentCntById(int id, int commentId) {
-		return articleDao.getCommentCntById(id, commentId);
+	public int getCommentCntById(int commentId, int id) {
+		return articleDao.getCommentCntById(commentId, id);
 	}
 
 	public Comment getCommentById(int commentId) {
 		return articleDao.getCommentById(commentId);
+	}
+
+	public void doCommentModify(int commentId, String commentTitle, String commentBody) {
+		articleDao.doCommentModify(commentId, commentTitle, commentBody);
 	}
 }
