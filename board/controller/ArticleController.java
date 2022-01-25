@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Scanner;
 
 import board.dto.Article;
+import board.dto.Comment;
 import board.service.ArticleService;
 import board.session.Session;
 
@@ -84,7 +85,7 @@ public class ArticleController extends Controller {
 
 		while (true) {
 
-			// 댓글 가이드
+			// 댓글 명령어 가이드
 			System.out.println(">> [댓글쓰기] 1 , [댓글수정] 2 , [댓글삭제] 3 , [댓글보기] 4, [나가기] 0");
 
 			// 명령어로 정수만 받도록
@@ -138,6 +139,8 @@ public class ArticleController extends Controller {
 				if (commentId == 0) {
 					continue;
 				}
+
+				Comment comment = articleService.getCommentById(commentId);
 
 				int commentCnt = articleService.getCommentCntById(id, commentId);
 

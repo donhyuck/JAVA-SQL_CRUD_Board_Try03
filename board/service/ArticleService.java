@@ -5,6 +5,7 @@ import java.util.List;
 
 import board.dao.ArticleDao;
 import board.dto.Article;
+import board.dto.Comment;
 
 public class ArticleService {
 
@@ -80,5 +81,9 @@ public class ArticleService {
 
 	public int getCommentCntById(int id, int commentId) {
 		return articleDao.getCommentCntById(id, commentId);
+	}
+
+	public Comment getCommentById(int commentId) {
+		return articleDao.getCommentById(commentId);
 	}
 }
