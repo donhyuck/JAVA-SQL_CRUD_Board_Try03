@@ -47,9 +47,6 @@ public class ArticleController extends Controller {
 		case "detail":
 			showDetail();
 			break;
-		case "like":
-			doLike();
-			break;
 		case "comment":
 			doComment();
 			break;
@@ -82,7 +79,7 @@ public class ArticleController extends Controller {
 		while (true) {
 
 			// 댓글 명령어 가이드
-			System.out.println(">> [댓글쓰기] 1 , [댓글수정] 2 , [댓글삭제] 3 , [댓글보기] 4, [나가기] 0");
+			System.out.println(">> [댓글쓰기] 1 , [댓글수정] 2 , [댓글삭제] 3 , [댓글보기] 4, [추천/반대] 5, [나가기] 0");
 
 			// 명령어로 정수만 받도록
 			int commentType;
@@ -114,6 +111,9 @@ public class ArticleController extends Controller {
 				break;
 			case 4:
 				showCommentPages(id);
+				break;
+			case 5:
+				doLike(id);
 				break;
 			default:
 				System.out.println("가이드에 표시된 숫자를 입력해주세요.");
@@ -284,25 +284,10 @@ public class ArticleController extends Controller {
 		}
 	}
 
-	private void doLike() {
+	private void doLike(int id) {
+
 		if (session.getLoginedMember() == null) {
 			System.out.println("로그인 후 이용해주세요.");
-			return;
-		}
-
-		boolean isInt = command.split(" ")[2].matches("-?\\d+");
-
-		if (!isInt) {
-			System.out.println("게시글의 ID는 숫자로 입력해주세요.");
-			return;
-		}
-
-		int id = Integer.parseInt(command.split(" ")[2].trim());
-
-		int foundArticleId = articleService.getArticlesCntById(id);
-
-		if (foundArticleId == 0) {
-			System.out.printf("%d번 게시글이 존재하지 않습니다.\n", id);
 			return;
 		}
 
