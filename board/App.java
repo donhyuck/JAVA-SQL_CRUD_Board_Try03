@@ -51,6 +51,7 @@ public class App {
 
 				// 명령어 앞 글자를 통해 해당하는 컨트롤러로 넘겨준다.
 				String controllerName = commandBits[0];
+				String actionMethodName = commandBits[1];
 
 				Controller controller = null;
 				ArticleController articleController = new ArticleController(conn, input, command, session);
@@ -61,8 +62,31 @@ public class App {
 				} else if (controllerName.equals("member")) {
 					controller = memberController;
 				} else {
-					System.out.println("존재하지 않는 명령어입니다.");
+					System.out.printf("%s는 존재하지 않는 명령어입니다.\n", command);
 					continue;
+				}
+
+				String actionName = controllerName + "/" + actionMethodName;
+
+				switch (actionName) {
+				case "article/write":
+				case "article/modify":
+				case "article/delete":
+					if (session.getLoginedMember() == null) {
+						System.out.println("로그인 후 이용해주세요");
+						continue;
+					}
+					break;
+				}
+
+				switch (actionName) {
+				case "member/join":
+				case "member/login":
+					if (session.getLoginedMember() != null) {
+						System.out.println("로그아웃 후 이용해주세요");
+						continue;
+					}
+					break;
 				}
 
 				controller.doAction();

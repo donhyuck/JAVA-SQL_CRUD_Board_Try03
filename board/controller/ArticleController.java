@@ -14,6 +14,7 @@ public class ArticleController extends Controller {
 	private Scanner input;
 	private String command;
 	private Session session;
+	private int id;
 
 	private ArticleService articleService;
 
@@ -58,6 +59,7 @@ public class ArticleController extends Controller {
 
 	private void doComment() {
 
+		// 숫자 이외의 게시글 번호 명령을 제외
 		boolean isInt = command.split(" ")[2].matches("-?\\d+");
 
 		if (!isInt) {
@@ -65,7 +67,8 @@ public class ArticleController extends Controller {
 			return;
 		}
 
-		int id = Integer.parseInt(command.split(" ")[2].trim());
+		// 존재하지 않는 게시글에 대한 명령 제외
+		id = Integer.parseInt(command.split(" ")[2].trim());
 
 		int foundArticleId = articleService.getArticlesCntById(id);
 
@@ -142,11 +145,6 @@ public class ArticleController extends Controller {
 	}
 
 	private void doModifyComment(int id) {
-
-		if (session.getLoginedMember() == null) {
-			System.out.println("로그인 후 이용해주세요.");
-			return;
-		}
 
 		int commentId;
 
@@ -347,11 +345,6 @@ public class ArticleController extends Controller {
 
 	private void doWrite() {
 
-		if (session.getLoginedMember() == null) {
-			System.out.println("로그인 후 이용해주세요.");
-			return;
-		}
-
 		System.out.println("== 게시글 작성 ==");
 
 		System.out.print("제목 : ");
@@ -467,11 +460,6 @@ public class ArticleController extends Controller {
 	}
 
 	private void doDelete() {
-
-		if (session.getLoginedMember() == null) {
-			System.out.println("로그인 후 이용해주세요.");
-			return;
-		}
 
 		boolean isInt = command.split(" ")[2].matches("-?\\d+");
 

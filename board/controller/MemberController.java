@@ -49,11 +49,6 @@ public class MemberController extends Controller {
 
 	private void doLogin() {
 
-		if (session.getLoginedMember() != null) {
-			System.out.println("이미 로그인 되어있습니다.");
-			return;
-		}
-
 		System.out.println("== 회원 로그인 ==");
 
 		String loginId;
@@ -128,11 +123,6 @@ public class MemberController extends Controller {
 	}
 
 	private void doJoin() {
-
-		if (session.getLoginedMember() != null) {
-			System.out.println("로그아웃 후 이용해주세요.");
-			return;
-		}
 
 		System.out.println("== 회원가입 ==");
 
