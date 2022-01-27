@@ -288,6 +288,17 @@ public class ArticleController extends Controller {
 			}
 
 			switch (commentType) {
+			case 1:
+			case 2:
+			case 3:
+			case 5:
+				if (session.getLoginedMember() == null) {
+					System.out.println("로그인 후 이용해주세요.");
+					return;
+				}
+			}
+
+			switch (commentType) {
 			case 0:
 				System.out.println("== 댓글 종료 ==");
 				return;
@@ -313,11 +324,6 @@ public class ArticleController extends Controller {
 	}
 
 	private void doCommentWrite(int id) {
-
-		if (session.getLoginedMember() == null) {
-			System.out.println("로그인 후 이용해주세요.");
-			return;
-		}
 
 		System.out.println("== 댓글 작성 ==");
 
@@ -379,11 +385,6 @@ public class ArticleController extends Controller {
 	}
 
 	private void doDeleteComment(int id) {
-
-		if (session.getLoginedMember() == null) {
-			System.out.println("로그인 후 이용해주세요.");
-			return;
-		}
 
 		System.out.println("== 댓글 삭제 ==");
 
@@ -472,11 +473,6 @@ public class ArticleController extends Controller {
 
 	private void doLike(int id) {
 
-		if (session.getLoginedMember() == null) {
-			System.out.println("로그인 후 이용해주세요.");
-			return;
-		}
-
 		System.out.println("== 게시글 추천/비추천 ==");
 		System.out.println(">> [추천] 1 , [비추천] 2 , [해제] 3 , [나가기] 0");
 		System.out.print("[article like] 명령어 : ");
@@ -484,7 +480,7 @@ public class ArticleController extends Controller {
 		input.nextLine();
 
 		if (likeType == 0) {
-			System.out.println("[article like] 종료");
+			System.out.println("== 게시글 추천/비추천 종료 ==");
 			return;
 		}
 
