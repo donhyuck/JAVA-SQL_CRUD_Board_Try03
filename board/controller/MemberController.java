@@ -47,81 +47,6 @@ public class MemberController extends Controller {
 		}
 	}
 
-	private void doLogin() {
-
-		System.out.println("== 회원 로그인 ==");
-
-		String loginId;
-		String loginPw;
-
-		// 로그인 입력횟수 제한
-		int blockCnt = 0;
-
-		while (true) {
-
-			if (blockCnt >= 3) {
-				System.out.println("입력횟수 초과! 다시 시도해주세요.");
-				return;
-			}
-
-			System.out.print("로그인 아이디 : ");
-			loginId = input.nextLine();
-
-			if (loginId.length() == 0) {
-				System.out.println("아이디를 입력해주세요.");
-				blockCnt++;
-				continue;
-			}
-
-			int memberCnt = memberService.getMemberCntByLoginId(loginId);
-
-			if (memberCnt == 0) {
-				System.out.println("아이디가 존재하지 않습니다.");
-				blockCnt++;
-				continue;
-			}
-			break;
-
-		}
-
-		blockCnt = 0;
-		Member member;
-
-		while (true) {
-
-			if (blockCnt >= 3) {
-				System.out.println("입력횟수 초과! 다시 시도해주세요.");
-				return;
-			}
-
-			System.out.print("로그인 비밀번호 : ");
-			loginPw = input.nextLine();
-
-			if (loginPw.length() == 0) {
-				System.out.println("비밀번호를 입력해주세요.");
-				blockCnt++;
-				continue;
-			}
-
-			// 등록된 회원의 비밀번호와 입력한 비밀번호가 일치하는지 확인해야함
-			member = memberService.getMemberByLoginId(loginId);
-
-			if (!member.getLoginPw().equals(loginPw)) {
-				System.out.println("비밀번호가 일치하지 않습니다.");
-				blockCnt++;
-				continue;
-			}
-			break;
-
-		}
-
-		System.out.printf("%s님 환영합니다.\n", member.getName());
-
-		session.setLoginedMemberId(member.getId());
-		session.setLoginedMember(member);
-
-	}
-
 	private void doJoin() {
 
 		System.out.println("== 회원가입 ==");
@@ -216,6 +141,81 @@ public class MemberController extends Controller {
 		memberService.doJoin(loginId, loginPw, name);
 
 		System.out.printf("%s님 환영합니다.\n", name);
+
+	}
+
+	private void doLogin() {
+
+		System.out.println("== 회원 로그인 ==");
+
+		String loginId;
+		String loginPw;
+
+		// 로그인 입력횟수 제한
+		int blockCnt = 0;
+
+		while (true) {
+
+			if (blockCnt >= 3) {
+				System.out.println("입력횟수 초과! 다시 시도해주세요.");
+				return;
+			}
+
+			System.out.print("로그인 아이디 : ");
+			loginId = input.nextLine();
+
+			if (loginId.length() == 0) {
+				System.out.println("아이디를 입력해주세요.");
+				blockCnt++;
+				continue;
+			}
+
+			int memberCnt = memberService.getMemberCntByLoginId(loginId);
+
+			if (memberCnt == 0) {
+				System.out.println("아이디가 존재하지 않습니다.");
+				blockCnt++;
+				continue;
+			}
+			break;
+
+		}
+
+		blockCnt = 0;
+		Member member;
+
+		while (true) {
+
+			if (blockCnt >= 3) {
+				System.out.println("입력횟수 초과! 다시 시도해주세요.");
+				return;
+			}
+
+			System.out.print("로그인 비밀번호 : ");
+			loginPw = input.nextLine();
+
+			if (loginPw.length() == 0) {
+				System.out.println("비밀번호를 입력해주세요.");
+				blockCnt++;
+				continue;
+			}
+
+			// 등록된 회원의 비밀번호와 입력한 비밀번호가 일치하는지 확인해야함
+			member = memberService.getMemberByLoginId(loginId);
+
+			if (!member.getLoginPw().equals(loginPw)) {
+				System.out.println("비밀번호가 일치하지 않습니다.");
+				blockCnt++;
+				continue;
+			}
+			break;
+
+		}
+
+		System.out.printf("%s님 환영합니다.\n", member.getName());
+
+		session.setLoginedMemberId(member.getId());
+		session.setLoginedMember(member);
 
 	}
 

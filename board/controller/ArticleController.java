@@ -38,16 +38,16 @@ public class ArticleController extends Controller {
 				System.out.println("잘못된 명령어입니다.");
 				return;
 			}
-			
+
 		case "modify":
 		case "delete":
 		case "detail":
-		case "comment":	
+		case "comment":
 			// 명령어 오류
 			if (cmdBits.length >= 4) {
 				System.out.println("잘못된 명령어입니다.");
 				return;
-				
+
 				// 게시글 번호 미입력
 			} else if (cmdBits.length == 2) {
 				System.out.println("게시글의 번호를 입력해주세요.");
@@ -89,6 +89,168 @@ public class ArticleController extends Controller {
 			System.out.println("존재하지 않는 명령어입니다.");
 			break;
 		}
+	}
+
+	private void doWrite() {
+
+		System.out.println("== 게시글 작성 ==");
+
+		System.out.print("제목 : ");
+		String title = input.nextLine();
+
+		System.out.print("내용 : ");
+		String body = input.nextLine();
+
+		int id = articleService.doWrite(title, body, session.getLoginedMemberId());
+
+		System.out.printf("%d번 게시글이 등록되었습니다.\n", id);
+
+	}
+
+	private void showList() {
+
+		String[] cmdBits = command.split(" ");
+		String SearchKeyword = "";
+		List<Article> articles;
+
+		// 게시글 목록을 페이징으로 작성
+		int page = 1;
+		int itemsInAPage = 5; // 한번에 보이는 게시글 수
+
+		while (true) {
+
+			// 검색어가 있는 경우 (article list ???)
+			if (cmdBits.length > 2) {
+				SearchKeyword = command.substring("article list ".length());
+				articles = articleService.getArticlesByKeyword(page, itemsInAPage, SearchKeyword);
+			}
+
+			// 검색어가 없는 경우 (article list) 모든 글을 출력
+			else {
+				if (command.length() != 12) {
+					System.out.println("잘못된 명령어입니다.");
+					return;
+				}
+				articles = articleService.getArticles(page, itemsInAPage);
+			}
+
+			if (articles.size() == 0) {
+				System.out.println("게시글이 존재하지 않습니다.");
+				return;
+			}
+
+			// 한 페이지에 itemsInAPage 만큼 게시글 출력
+			System.out.println("== 게시글 목록 ==");
+			System.out.println("번호 / 제목 / 작성자");
+			for (Article article : articles) {
+				System.out.printf(" %d / %s / %s\n", article.getId(), article.getTitle(), article.getExtra_writer());
+			}
+
+			// 현재 페이지, 마지막 페이지, 전체 글 수
+			int articleCnt = articleService.getArticlesCnt(SearchKeyword);
+			int lastPage = (int) Math.ceil(articleCnt / (double) itemsInAPage);
+
+			System.out.printf("페이지 %d / %d, 게시글 %d건\n", page, lastPage, articleCnt);
+			System.out.println("\n== [나가기] 0이하입력 [게시글 목록 이동] 페이지입력 ==");
+			System.out.print("[article list] 명령어 : ");
+			page = input.nextInt();
+
+			input.nextLine();
+
+			if (page <= 0) {
+				System.out.println("게시글 목록을 나갑니다.");
+				break;
+			}
+		}
+
+	}
+
+	private void doModify() {
+
+		// 존재하지 않는 게시글에 대한 명령 제외
+		int id = Integer.parseInt(command.split(" ")[2].trim());
+
+		int foundArticleId = articleService.getArticlesCntById(id);
+
+		if (foundArticleId == 0) {
+			System.out.printf("%d번 게시글이 존재하지 않습니다.\n", id);
+			return;
+		}
+
+		// 게시글의 작성자를 파악해서 그 사람만 수정, 삭제하도록
+		Article article = articleService.getArticle(id);
+
+		if (article.getMemberId() != session.getLoginedMemberId()) {
+			System.out.printf("%s님은 %d번 게시글에 대한 권한이 없습니다.\n", session.getLoginedMember().getName(), id);
+			return;
+		}
+
+		System.out.println("== 게시글 수정 ==");
+		System.out.print("새 제목 : ");
+		String title = input.nextLine();
+		System.out.print("새 내용 : ");
+		String body = input.nextLine();
+
+		articleService.doModify(title, body, id);
+		System.out.printf("%d번 게시글이 수정되었습니다.\n", id);
+
+	}
+
+	private void doDelete() {
+
+		// 존재하지 않는 게시글에 대한 명령 제외
+		int id = Integer.parseInt(command.split(" ")[2].trim());
+
+		int foundArticleId = articleService.getArticlesCntById(id);
+
+		if (foundArticleId == 0) {
+			System.out.printf("%d번 게시글이 존재하지 않습니다.\n", id);
+			return;
+		}
+
+		// 게시글의 작성자를 파악해서 그 사람만 수정, 삭제하도록
+		Article article = articleService.getArticle(id);
+
+		if (article.getMemberId() != session.getLoginedMemberId()) {
+			System.out.printf("%s님은 %d번 게시글에 대한 권한이 없습니다.\n", session.getLoginedMember().getName(), id);
+			return;
+		}
+
+		articleService.doDelete(id);
+		System.out.printf("%d번 게시글이 삭제되었습니다.\n", id);
+
+	}
+
+	private void showDetail() {
+
+		// 존재하지 않는 게시글에 대한 명령 제외
+		int id = Integer.parseInt(command.split(" ")[2].trim());
+
+		int foundArticleId = articleService.getArticlesCntById(id);
+
+		if (foundArticleId == 0) {
+			System.out.printf("%d번 게시글이 존재하지 않습니다.\n", id);
+			return;
+		}
+
+		articleService.increaseHit(id);
+
+		Article article = articleService.getArticle(id);
+
+		// 해당 게시글의 추천/비추천 수
+		int likeVal = articleService.getLikeVal(id, 1);
+		int disLikeVal = articleService.getLikeVal(id, 2);
+
+		System.out.printf("== %d번 게시글 조회 ==\n", id);
+		System.out.printf(" 번 호  : %d\n", article.getId());
+		System.out.printf("등록날짜 : %s\n", article.getRegDate());
+		System.out.printf("수정날짜 : %s\n", article.getUpdateDate());
+		System.out.printf(" 작성자  : %s\n", article.getExtra_writer());
+		System.out.printf(" 제 목  : %s\n", article.getTitle());
+		System.out.printf(" 내 용  : %s\n", article.getBody());
+		System.out.printf(" 조회수  : %d\n", article.getHit());
+		System.out.printf(" 추천 [%d] 비추천 [%d] \n", likeVal, disLikeVal);
+
 	}
 
 	private void doComment() {
@@ -367,167 +529,5 @@ public class ArticleController extends Controller {
 				System.out.printf("%s으로 변경완료\n", msg);
 			}
 		}
-	}
-
-	private void doWrite() {
-
-		System.out.println("== 게시글 작성 ==");
-
-		System.out.print("제목 : ");
-		String title = input.nextLine();
-
-		System.out.print("내용 : ");
-		String body = input.nextLine();
-
-		int id = articleService.doWrite(title, body, session.getLoginedMemberId());
-
-		System.out.printf("%d번 게시글이 등록되었습니다.\n", id);
-
-	}
-
-	private void showList() {
-
-		String[] cmdBits = command.split(" ");
-		String SearchKeyword = "";
-		List<Article> articles;
-
-		// 게시글 목록을 페이징으로 작성
-		int page = 1;
-		int itemsInAPage = 5; // 한번에 보이는 게시글 수
-
-		while (true) {
-
-			// 검색어가 있는 경우 (article list ???)
-			if (cmdBits.length > 2) {
-				SearchKeyword = command.substring("article list ".length());
-				articles = articleService.getArticlesByKeyword(page, itemsInAPage, SearchKeyword);
-			}
-
-			// 검색어가 없는 경우 (article list) 모든 글을 출력
-			else {
-				if (command.length() != 12) {
-					System.out.println("잘못된 명령어입니다.");
-					return;
-				}
-				articles = articleService.getArticles(page, itemsInAPage);
-			}
-
-			if (articles.size() == 0) {
-				System.out.println("게시글이 존재하지 않습니다.");
-				return;
-			}
-
-			// 한 페이지에 itemsInAPage 만큼 게시글 출력
-			System.out.println("== 게시글 목록 ==");
-			System.out.println("번호 / 제목 / 작성자");
-			for (Article article : articles) {
-				System.out.printf(" %d / %s / %s\n", article.getId(), article.getTitle(), article.getExtra_writer());
-			}
-
-			// 현재 페이지, 마지막 페이지, 전체 글 수
-			int articleCnt = articleService.getArticlesCnt(SearchKeyword);
-			int lastPage = (int) Math.ceil(articleCnt / (double) itemsInAPage);
-
-			System.out.printf("페이지 %d / %d, 게시글 %d건\n", page, lastPage, articleCnt);
-			System.out.println("\n== [나가기] 0이하입력 [게시글 목록 이동] 페이지입력 ==");
-			System.out.print("[article list] 명령어 : ");
-			page = input.nextInt();
-
-			input.nextLine();
-
-			if (page <= 0) {
-				System.out.println("게시글 목록을 나갑니다.");
-				break;
-			}
-		}
-
-	}
-
-	private void doModify() {
-
-		// 존재하지 않는 게시글에 대한 명령 제외
-		int id = Integer.parseInt(command.split(" ")[2].trim());
-
-		int foundArticleId = articleService.getArticlesCntById(id);
-
-		if (foundArticleId == 0) {
-			System.out.printf("%d번 게시글이 존재하지 않습니다.\n", id);
-			return;
-		}
-
-		// 게시글의 작성자를 파악해서 그 사람만 수정, 삭제하도록
-		Article article = articleService.getArticle(id);
-
-		if (article.getMemberId() != session.getLoginedMemberId()) {
-			System.out.printf("%s님은 %d번 게시글에 대한 권한이 없습니다.\n", session.getLoginedMember().getName(), id);
-			return;
-		}
-
-		System.out.println("== 게시글 수정 ==");
-		System.out.print("새 제목 : ");
-		String title = input.nextLine();
-		System.out.print("새 내용 : ");
-		String body = input.nextLine();
-
-		articleService.doModify(title, body, id);
-		System.out.printf("%d번 게시글이 수정되었습니다.\n", id);
-
-	}
-
-	private void doDelete() {
-
-		// 존재하지 않는 게시글에 대한 명령 제외
-		int id = Integer.parseInt(command.split(" ")[2].trim());
-
-		int foundArticleId = articleService.getArticlesCntById(id);
-
-		if (foundArticleId == 0) {
-			System.out.printf("%d번 게시글이 존재하지 않습니다.\n", id);
-			return;
-		}
-
-		// 게시글의 작성자를 파악해서 그 사람만 수정, 삭제하도록
-		Article article = articleService.getArticle(id);
-
-		if (article.getMemberId() != session.getLoginedMemberId()) {
-			System.out.printf("%s님은 %d번 게시글에 대한 권한이 없습니다.\n", session.getLoginedMember().getName(), id);
-			return;
-		}
-
-		articleService.doDelete(id);
-		System.out.printf("%d번 게시글이 삭제되었습니다.\n", id);
-
-	}
-
-	private void showDetail() {
-
-		// 존재하지 않는 게시글에 대한 명령 제외
-		int id = Integer.parseInt(command.split(" ")[2].trim());
-
-		int foundArticleId = articleService.getArticlesCntById(id);
-
-		if (foundArticleId == 0) {
-			System.out.printf("%d번 게시글이 존재하지 않습니다.\n", id);
-			return;
-		}
-
-		articleService.increaseHit(id);
-
-		Article article = articleService.getArticle(id);
-
-		// 해당 게시글의 추천/비추천 수
-		int likeVal = articleService.getLikeVal(id, 1);
-		int disLikeVal = articleService.getLikeVal(id, 2);
-
-		System.out.printf("== %d번 게시글 조회 ==\n", id);
-		System.out.printf(" 번 호  : %d\n", article.getId());
-		System.out.printf("등록날짜 : %s\n", article.getRegDate());
-		System.out.printf("수정날짜 : %s\n", article.getUpdateDate());
-		System.out.printf(" 작성자  : %s\n", article.getExtra_writer());
-		System.out.printf(" 제 목  : %s\n", article.getTitle());
-		System.out.printf(" 내 용  : %s\n", article.getBody());
-		System.out.printf(" 조회수  : %d\n", article.getHit());
-		System.out.printf(" 추천 [%d] 비추천 [%d] \n", likeVal, disLikeVal);
-
 	}
 }
