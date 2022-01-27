@@ -9,6 +9,7 @@ import board.dto.Article;
 import board.dto.Comment;
 import board.service.ArticleService;
 import board.session.Session;
+import board.util.Util;
 
 public class ArticleController extends Controller {
 	private Scanner input;
@@ -84,11 +85,38 @@ public class ArticleController extends Controller {
 		case "comment":
 			doComment();
 			break;
-
+		case "export":
+			exportHtml();
+			break;
 		default:
 			System.out.println("존재하지 않는 명령어입니다.");
 			break;
 		}
+	}
+
+	private void exportHtml() {
+
+		System.out.println("== HTML 생성을 시작합니다 ==");
+
+		List<Article> articles = articleService.getArticles();
+
+		for (Article article : articles) {
+
+			String fileName = "./html/" + article.getId() + ".html";
+			String html = "<meta charset=\"UTF-8\">";
+			html += "<div>번호: " + article.getId() + "</div>";
+			html += "<div>날짜: " + article.getRegDate() + "</div>";
+			html += "<div>작성자: " + article.getExtra_writer() + "</div>";
+			html += "<div>제목: " + article.getTitle() + "</div>";
+			html += "<div>내용: " + article.getBody() + "</div>";
+
+			html += "<div><a href=\"" + (article.getId() - 1) + ".html\">이전글</a></div>";
+			html += "<div><a href=\"" + (article.getId() + 1) + ".html\">다음글</a></div>";
+
+			Util.writeFileContents(fileName, html);
+
+		}
+
 	}
 
 	private void doWrite() {

@@ -8,6 +8,7 @@ import java.util.Scanner;
 import board.controller.ArticleController;
 import board.controller.Controller;
 import board.controller.MemberController;
+import board.service.ArticleService;
 import board.session.Session;
 
 public class App {

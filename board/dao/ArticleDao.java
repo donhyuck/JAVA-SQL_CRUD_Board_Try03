@@ -290,4 +290,23 @@ public class ArticleDao {
 
 		return DBUtil.selectRowIntValue(conn, sql);
 	}
+
+	public List<Article> getArticles() {
+		List<Article> articles = new ArrayList<>();
+
+		SecSql sql = new SecSql();
+		sql.append("SELECT a.*, m.name AS extra_writer");
+		sql.append("FROM article AS a");
+		sql.append("LEFT JOIN `member` AS m");
+		sql.append("ON a.memberId = m.id");
+		sql.append("ORDER BY a.id DESC");
+
+		List<Map<String, Object>> articleListMap = DBUtil.selectRows(conn, sql);
+
+		for (Map<String, Object> articleMap : articleListMap) {
+			articles.add(new Article(articleMap));
+		}
+
+		return articles;
+	}
 }

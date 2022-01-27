@@ -104,4 +104,8 @@ public class ArticleService {
 	public int getCommentsCnt(int id) {
 		return articleDao.getCommentsCnt(id);
 	}
+
+	public List<Article> getArticles() {
+		return articleDao.getArticles();
+	}
 }
