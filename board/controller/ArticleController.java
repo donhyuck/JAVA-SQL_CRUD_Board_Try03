@@ -14,7 +14,6 @@ public class ArticleController extends Controller {
 	private Scanner input;
 	private String command;
 	private Session session;
-	private int id;
 
 	private ArticleService articleService;
 
@@ -31,6 +30,40 @@ public class ArticleController extends Controller {
 
 		String[] cmdBits = command.split(" ");
 		String actionMethodName = cmdBits[1];
+
+		// 명령어 오류 제외
+		switch (actionMethodName) {
+		case "write":
+			if (cmdBits.length != 2) {
+				System.out.println("잘못된 명령어입니다.");
+				return;
+			}
+			
+		case "modify":
+		case "delete":
+		case "detail":
+		case "comment":	
+			// 명령어 오류
+			if (cmdBits.length >= 4) {
+				System.out.println("잘못된 명령어입니다.");
+				return;
+				
+				// 게시글 번호 미입력
+			} else if (cmdBits.length == 2) {
+				System.out.println("게시글의 번호를 입력해주세요.");
+				return;
+
+				// 문자입력시 제외
+			} else {
+				boolean isInt = command.split(" ")[2].matches("-?\\d+");
+
+				if (!isInt) {
+					System.out.println("게시글의 ID는 숫자로 입력해주세요.");
+					return;
+				}
+			}
+
+		}
 
 		switch (actionMethodName) {
 		case "write":
@@ -51,6 +84,7 @@ public class ArticleController extends Controller {
 		case "comment":
 			doComment();
 			break;
+
 		default:
 			System.out.println("존재하지 않는 명령어입니다.");
 			break;
@@ -59,16 +93,8 @@ public class ArticleController extends Controller {
 
 	private void doComment() {
 
-		// 숫자 이외의 게시글 번호 명령을 제외
-		boolean isInt = command.split(" ")[2].matches("-?\\d+");
-
-		if (!isInt) {
-			System.out.println("게시글의 ID는 숫자로 입력해주세요.");
-			return;
-		}
-
 		// 존재하지 않는 게시글에 대한 명령 제외
-		id = Integer.parseInt(command.split(" ")[2].trim());
+		int id = Integer.parseInt(command.split(" ")[2].trim());
 
 		int foundArticleId = articleService.getArticlesCntById(id);
 
@@ -391,8 +417,8 @@ public class ArticleController extends Controller {
 				return;
 			}
 
+			// 한 페이지에 itemsInAPage 만큼 게시글 출력
 			System.out.println("== 게시글 목록 ==");
-
 			System.out.println("번호 / 제목 / 작성자");
 			for (Article article : articles) {
 				System.out.printf(" %d / %s / %s\n", article.getId(), article.getTitle(), article.getExtra_writer());
@@ -410,7 +436,7 @@ public class ArticleController extends Controller {
 			input.nextLine();
 
 			if (page <= 0) {
-				System.out.println("게시글 페이지를 나갑니다.");
+				System.out.println("게시글 목록을 나갑니다.");
 				break;
 			}
 		}
@@ -419,18 +445,7 @@ public class ArticleController extends Controller {
 
 	private void doModify() {
 
-		if (session.getLoginedMember() == null) {
-			System.out.println("로그인 후 이용해주세요.");
-			return;
-		}
-
-		boolean isInt = command.split(" ")[2].matches("-?\\d+");
-
-		if (!isInt) {
-			System.out.println("게시글의 ID는 숫자로 입력해주세요.");
-			return;
-		}
-
+		// 존재하지 않는 게시글에 대한 명령 제외
 		int id = Integer.parseInt(command.split(" ")[2].trim());
 
 		int foundArticleId = articleService.getArticlesCntById(id);
@@ -461,13 +476,7 @@ public class ArticleController extends Controller {
 
 	private void doDelete() {
 
-		boolean isInt = command.split(" ")[2].matches("-?\\d+");
-
-		if (!isInt) {
-			System.out.println("게시글의 ID는 숫자로 입력해주세요.");
-			return;
-		}
-
+		// 존재하지 않는 게시글에 대한 명령 제외
 		int id = Integer.parseInt(command.split(" ")[2].trim());
 
 		int foundArticleId = articleService.getArticlesCntById(id);
@@ -492,13 +501,7 @@ public class ArticleController extends Controller {
 
 	private void showDetail() {
 
-		boolean isInt = command.split(" ")[2].matches("-?\\d+");
-
-		if (!isInt) {
-			System.out.println("게시글의 ID는 숫자로 입력해주세요.");
-			return;
-		}
-
+		// 존재하지 않는 게시글에 대한 명령 제외
 		int id = Integer.parseInt(command.split(" ")[2].trim());
 
 		int foundArticleId = articleService.getArticlesCntById(id);
